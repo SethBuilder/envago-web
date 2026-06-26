@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "qr.stripe.com" },
+      { protocol: "https", hostname: "painel.envago.live" },
     ],
   },
   async redirects() {
