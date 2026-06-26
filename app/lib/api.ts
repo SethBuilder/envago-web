@@ -1,4 +1,9 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8001";
+// Server-side: use full URL. Client-side: use relative URL so requests
+// go through the Next.js rewrite proxy (avoids mixed-content on HTTPS).
+const API_URL =
+  typeof window === "undefined"
+    ? (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8001")
+    : "";
 
 export interface ApiReview {
   author_name: string;
