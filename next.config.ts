@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "qr.stripe.com" },
     ],
   },
+  async redirects() {
+    return [
+      { source: "/login", destination: "https://api.envago.live/login", permanent: false },
+      { source: "/provider/:path*", destination: "https://api.envago.live/provider/:path*", permanent: false },
+      { source: "/admin/:path*", destination: "https://api.envago.live/admin/:path*", permanent: false },
+    ];
+  },
   async rewrites() {
     return [
       {
