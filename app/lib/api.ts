@@ -81,7 +81,8 @@ export async function fetchActivities(params?: {
   city?: string;
   page?: number;
 }): Promise<ActivitiesResponse> {
-  const url = new URL(`${API_URL}/api/v1/activities`);
+  const base = API_URL || (typeof window !== "undefined" ? window.location.origin : "");
+  const url = new URL(`${base}/api/v1/activities`);
   if (params?.category && params.category !== "todos") {
     url.searchParams.set("category", params.category);
   }
