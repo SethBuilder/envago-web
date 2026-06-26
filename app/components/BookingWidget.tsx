@@ -41,7 +41,8 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
 
   function selectDate(date: string) {
     setSelectedDate(date);
-    setSelectedSchedule(byDate[date][0]);
+    const first = byDate[date].find((s) => s.seats_left > 0) ?? byDate[date][0];
+    setSelectedSchedule(first);
     setSeats(1);
   }
 
@@ -75,14 +76,19 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
       <div>
         <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">Escolha a data</p>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {dates.slice(0, 10).map((date) => (
-            <button key={date} onClick={() => selectDate(date)}
-              className={`flex-shrink-0 px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                selectedDate === date ? "bg-[#ff2924] text-white border-[#ff2924]" : "border-[#E5E1DC] text-[#555] hover:border-[#ff2924]"
-              }`}>
-              {formatDate(date)}
-            </button>
-          ))}
+          {dates.slice(0, 10).map((date) => {
+            const soldOut = byDate[date].every((s) => s.seats_left === 0);
+            return (
+              <button key={date} onClick={() => !soldOut && selectDate(date)} disabled={soldOut}
+                className={`flex-shrink-0 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                  soldOut ? "border-[#E5E1DC] text-[#ccc] cursor-not-allowed line-through"
+                  : selectedDate === date ? "bg-[#ff2924] text-white border-[#ff2924] cursor-pointer"
+                  : "border-[#E5E1DC] text-[#555] hover:border-[#ff2924] cursor-pointer"
+                }`}>
+                {formatDate(date)}
+              </button>
+            );
+          })}
         </div>
       </div>
 
