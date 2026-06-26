@@ -12,9 +12,9 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: "/login", destination: "https://api.envago.live/login", permanent: false },
-      { source: "/provider/:path*", destination: "https://api.envago.live/provider/:path*", permanent: false },
-      { source: "/admin/:path*", destination: "https://api.envago.live/admin/:path*", permanent: false },
+      { source: "/login", destination: "https://painel.envago.live/login", permanent: false },
+      { source: "/provider/:path*", destination: "https://painel.envago.live/provider/:path*", permanent: false },
+      { source: "/admin/:path*", destination: "https://painel.envago.live/admin/:path*", permanent: false },
     ];
   },
   async rewrites() {
