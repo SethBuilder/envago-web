@@ -15,9 +15,24 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const { data } = await fetchProvider(slug);
+    const title = `${data.business_name} | Envago`;
+    const city = data.activities[0]?.city;
+    const description = `Reserve passeios com ${data.business_name}${city ? ` em ${city}` : ""} no Envago. Pague online, confirme na hora.`;
+    const url = `https://envago.live/operadores/${slug}`;
     return {
-      title: `${data.business_name} | Envago`,
-      description: `Reserve passeios com ${data.business_name} no Envago.`,
+      title,
+      description,
+      alternates: { canonical: url },
+      openGraph: {
+        title,
+        description,
+        url,
+        type: "website",
+        locale: "pt_BR",
+        siteName: "Envago",
+        ...(data.logo_url ? { images: [{ url: data.logo_url, alt: data.business_name }] } : {}),
+      },
+      twitter: { card: "summary_large_image", title, description },
     };
   } catch {
     return { title: "Operador | Envago" };

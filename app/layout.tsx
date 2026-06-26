@@ -8,6 +8,7 @@ const raleway = Raleway({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://envago.live"),
   title: "Envago | Passeios e Aventuras no Brasil",
   description:
     "Reserve os melhores passeios de buggy, kitesurf, barco e trilhas no Brasil. Pague online, confirme na hora.",
@@ -20,7 +21,10 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     siteName: "Envago",
+    url: "https://envago.live",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "Envago" }],
   },
+  twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
   alternates: { canonical: "https://envago.live" },
 };

@@ -22,9 +22,24 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const { data } = await fetchActivity(slug);
+    const title = `${data.name} em ${data.city} | Envago`;
+    const description = data.description ?? `Reserve ${data.name} em ${data.city}, ${data.state}. A partir de R$ ${Number(data.price).toFixed(0)}.`;
+    const url = `https://envago.live/passeio/${slug}`;
+    const image = data.cover_url ?? undefined;
     return {
-      title: `${data.name} em ${data.city} | Envago`,
-      description: data.description ?? `Reserve ${data.name} em ${data.city}, ${data.state}. A partir de R$ ${Number(data.price).toFixed(0)}.`,
+      title,
+      description,
+      alternates: { canonical: url },
+      openGraph: {
+        title,
+        description,
+        url,
+        type: "website",
+        locale: "pt_BR",
+        siteName: "Envago",
+        ...(image ? { images: [{ url: image, alt: data.name }] } : {}),
+      },
+      twitter: { card: "summary_large_image", title, description, ...(image ? { images: [image] } : {}) },
     };
   } catch {
     return { title: "Passeio | Envago" };
@@ -51,8 +66,38 @@ export default async function ActivityPage({
     ...activity.gallery,
   ].filter(Boolean) as string[];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TouristTrip",
+    name: activity.name,
+    description: activity.description ?? undefined,
+    url: `https://envago.live/passeio/${activity.slug}`,
+    image: photos[0] ?? undefined,
+    touristType: activity.category?.name ?? undefined,
+    offers: {
+      "@type": "Offer",
+      price: Number(activity.price).toFixed(2),
+      priceCurrency: "BRL",
+      availability: "https://schema.org/InStock",
+      url: `https://envago.live/passeio/${activity.slug}`,
+    },
+    provider: activity.provider ? {
+      "@type": "TouristInformationCenter",
+      name: activity.provider.business_name,
+      url: `https://envago.live/operadores/${activity.provider.slug}`,
+    } : undefined,
+    ...(activity.avg_rating ? {
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: activity.avg_rating,
+        reviewCount: activity.review_count,
+      },
+    } : {}),
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-20">
         {/* Breadcrumb */}
