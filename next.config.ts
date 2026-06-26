@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
         source: "/api/webhooks/:path*",
         destination: `${API_ORIGIN}/api/webhooks/:path*`,
       },
+      {
+        source: "/api/lara/:path*",
+        destination: `${API_ORIGIN}/api/lara/:path*`,
+      },
     ];
   },
 };

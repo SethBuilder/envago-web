@@ -41,7 +41,7 @@ export default function LaraChat() {
     setTyping(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/lara/message`, {
+      const res = await fetch(`/api/lara/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId, message: text, context: 'website' }),
@@ -90,29 +90,7 @@ export default function LaraChat() {
 
   return (
     <>
-      {/* Floating button */}
-      {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          aria-label="Listar meu passeio"
-          style={{
-            position: 'fixed', bottom: 24, right: 24, zIndex: 1000,
-            width: 56, height: 56, borderRadius: '50%',
-            background: '#FF2924', border: 'none', cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(255,41,36,.4)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'transform .15s, box-shadow .15s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
-          onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
-        >
-          <svg width="24" height="24" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-        </button>
-      )}
-
-      {/* Chat panel */}
+      {/* Chat panel — opened only via open-lara event */}
       {open && (
         <div style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 1000,
