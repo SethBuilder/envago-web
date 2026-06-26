@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     siteName: "Envago",
     url: "https://envago.live",
-    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "Envago" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Envago" }],
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
