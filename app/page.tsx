@@ -1,65 +1,91 @@
-import Image from "next/image";
+import Navbar from "./components/Navbar";
+import Feed from "./components/Feed";
+import { fetchActivities, fetchCategories } from "./lib/api";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const [{ data: initialActivities, meta }, apiCategories] = await Promise.all([
+    fetchActivities(),
+    fetchCategories(),
+  ]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "Envago",
+            url: "https://envago.live",
+            description: "Reserve passeios e aventuras no Brasil.",
+          }),
+        }}
+      />
+
+      <Navbar />
+
+      <main className="pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#111] leading-tight">
+            Descubra Passeios e
+            <br />
+            <span className="text-[#ff2924]">Aventuras no Brasil</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-3 text-[#666] text-base sm:text-lg max-w-xl">
+            Reserve online, pague com segurança e viva experiências inesquecíveis.
+            Do kitesurf em Jericoacoara às trilhas do Pantanal.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        <Feed initialActivities={initialActivities} initialMeta={meta} apiCategories={apiCategories} />
+
+        <section id="como-funciona" className="mt-20 max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#E5E1DC]">
+            <h2 className="text-2xl font-bold text-[#111] mb-8 text-center">Como funciona</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+              {[
+                { icon: "🔍", step: "01", title: "Encontre o passeio", desc: "Busque por destino, tipo de aventura ou data. Centenas de opções em todo Brasil." },
+                { icon: "📱", step: "02", title: "Reserve online", desc: "Pague com PIX ou cartão. Receba confirmação na hora. Sem burocracia." },
+                { icon: "🌄", step: "03", title: "Viva a aventura", desc: "Apareça no horário marcado e aproveite. O operador já sabe que você vem." },
+              ].map((item) => (
+                <div key={item.step} className="flex flex-col items-center gap-3">
+                  <span className="text-4xl">{item.icon}</span>
+                  <span className="text-xs font-bold text-[#ff2924] tracking-widest">PASSO {item.step}</span>
+                  <h3 className="font-semibold text-[#111]">{item.title}</h3>
+                  <p className="text-sm text-[#666] leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="operadores" className="mt-12 max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="bg-[#ff2924] rounded-3xl p-8 sm:p-12 text-white text-center">
+            <h2 className="text-2xl font-bold mb-3">Você é operador de passeios?</h2>
+            <p className="text-white/80 mb-6 max-w-lg mx-auto">
+              Cadastre seu tour gratuitamente. Sem mensalidade, sem taxa de setup.
+              Você paga só quando vende — 10% por reserva gerada pela Envago.
+            </p>
+            <a id="listar" href="#listar" className="inline-block bg-white text-[#ff2924] font-bold px-8 py-3 rounded-full hover:bg-[#fff0f0] transition-colors">
+              Listar meu passeio grátis
+            </a>
+          </div>
+        </section>
       </main>
-    </div>
+
+      <footer className="border-t border-[#E5E1DC] bg-white mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#999]">
+          <span>© 2026 Envago. Todos os direitos reservados.</span>
+          <div className="flex gap-6">
+            <a href="/privacidade" className="hover:text-[#111] transition-colors">Privacidade</a>
+            <a href="/termos" className="hover:text-[#111] transition-colors">Termos de uso</a>
+            <a href="/contato" className="hover:text-[#111] transition-colors">Contato</a>
+          </div>
+        </div>
+      </footer>
+    </>
   );
 }
