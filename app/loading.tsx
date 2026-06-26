@@ -11,6 +11,14 @@ export default function Loading() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Hero text skeleton */}
+        <div className="py-10 sm:py-14 flex flex-col gap-4">
+          <div className="h-9 bg-[#E5E1DC] rounded w-3/4" />
+          <div className="h-9 bg-[#E5E1DC] rounded w-1/2" />
+          <div className="h-4 bg-[#E5E1DC] rounded w-full max-w-xl mt-1" />
+          <div className="h-4 bg-[#E5E1DC] rounded w-4/5 max-w-xl" />
+        </div>
+
         {/* Category bar skeleton — matches icon + label pill layout */}
         <div className="flex gap-2 py-4 overflow-hidden">
           {[...Array(10)].map((_, i) => (
