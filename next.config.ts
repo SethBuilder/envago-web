@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const API_ORIGIN = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8001";
+const API_ORIGIN = process.env.NEXT_PUBLIC_API_URL ?? "https://api.envago.live";
 
 const nextConfig: NextConfig = {
   images: {
@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "qr.stripe.com" },
-      { protocol: "https", hostname: "painel.envago.live" },
+      { protocol: "https", hostname: "api.envago.live" },
     ],
   },
   async redirects() {
