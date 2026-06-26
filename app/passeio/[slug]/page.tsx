@@ -62,7 +62,7 @@ export default async function ActivityPage({
   }
 
   const photos = [
-    activity.cover_url ?? `https://picsum.photos/seed/${activity.slug}/800/500`,
+    activity.cover_url,
     ...activity.gallery,
   ].filter(Boolean) as string[];
 

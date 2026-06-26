@@ -14,20 +14,27 @@ function formatDuration(minutes: number): string {
 }
 
 export default function ActivityCard({ activity }: { activity: ApiActivity }) {
-  const cover = activity.cover_url ?? `https://picsum.photos/seed/${activity.slug}/600/400`;
-
   return (
     <Link href={`/passeio/${activity.slug}`} className="block cursor-pointer group">
       <article className="bg-white rounded-2xl overflow-hidden shadow-sm group-hover:shadow-md transition-shadow border border-[#E5E1DC] flex flex-col">
         {/* Photo */}
-        <div className="relative aspect-[4/3] overflow-hidden">
-          <Image
-            src={cover}
-            alt={activity.name}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+        <div className="relative aspect-[4/3] overflow-hidden bg-[#F0EDE8]">
+          {activity.cover_url ? (
+            <Image
+              src={activity.cover_url}
+              alt={activity.name}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <svg width="40" height="40" fill="none" stroke="#C5BDB5" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+          )}
 
           {/* Gradient + ticker overlay */}
           {activity.recent_reviews.length > 0 && (
