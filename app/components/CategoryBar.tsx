@@ -24,7 +24,7 @@ export default function CategoryBar() {
                   className={`w-18 h-18 object-contain ${
                     cat.slug === "todos"
                       ? "brightness-0 invert"
-                      : "opacity-90 group-hover:opacity-100"
+                      : ""
                   }`}
                 />
               ) : (

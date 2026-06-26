@@ -69,13 +69,11 @@ export default function Feed({
                       alt={cat.label}
                       width={72}
                       height={72}
-                      className={`w-18 h-18 object-contain transition-all ${
-                        isActive ? "opacity-100" : "opacity-90 group-hover:opacity-100"
-                      }`}
+                      className="w-18 h-18 object-contain transition-all"
                     />
                   ) : (
                     <span className="w-18 h-18 flex items-center justify-center">
-                      <svg viewBox="0 0 72 72" className="w-full h-full opacity-80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <svg viewBox="0 0 72 72" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="8" y="8" width="24" height="24" rx="4" fill="currentColor"/>
                         <rect x="40" y="8" width="24" height="24" rx="4" fill="currentColor"/>
                         <rect x="8" y="40" width="24" height="24" rx="4" fill="currentColor"/>
