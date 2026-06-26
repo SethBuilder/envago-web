@@ -462,15 +462,15 @@ export default function CheckoutFlow({
         <div className="flex flex-col gap-6">
           {/* Step indicator */}
           <div className="flex items-center gap-3 text-sm">
-            <div className={`flex items-center gap-2 font-semibold ${step === "contact" ? "text-[#111]" : "text-[#999]"}`}>
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${step === "contact" ? "bg-[#ff2924] text-white" : "bg-green-100 text-green-600"}`}>
+            <div className={`flex items-center gap-2 font-semibold ${step === "contact" ? "text-[#111]" : "text-green-700"}`}>
+              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === "contact" ? "bg-[#ff2924] text-white" : "bg-green-500 text-white"}`}>
                 {step === "contact" ? "1" : "✓"}
               </span>
               Seus dados
             </div>
-            <span className="text-[#ddd]">——</span>
-            <div className={`flex items-center gap-2 font-semibold ${step === "payment" ? "text-[#111]" : "text-[#999]"}`}>
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${step === "payment" ? "bg-[#ff2924] text-white" : "bg-[#E5E1DC] text-[#999]"}`}>
+            <span className="text-[#bbb] font-bold tracking-widest">——</span>
+            <div className={`flex items-center gap-2 font-semibold ${step === "payment" ? "text-[#111]" : "text-[#777]"}`}>
+              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === "payment" ? "bg-[#ff2924] text-white" : "bg-[#999] text-white"}`}>
                 2
               </span>
               Pagamento
