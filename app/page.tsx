@@ -1,5 +1,6 @@
 import Navbar from "./components/Navbar";
 import Feed from "./components/Feed";
+import LaraButton from "./components/LaraButton";
 import { fetchActivities, fetchCategories } from "./lib/api";
 
 export const dynamic = "force-dynamic";
@@ -69,9 +70,7 @@ export default async function Home() {
               Cadastre seu tour gratuitamente. Sem mensalidade, sem taxa de setup.
               Você paga só quando vende — 10% por reserva gerada pela Envago.
             </p>
-            <a id="listar" href="#listar" className="inline-block bg-white text-[#ff2924] font-bold px-8 py-3 rounded-full hover:bg-[#fff0f0] transition-colors">
-              Listar meu passeio grátis
-            </a>
+            <LaraButton />
           </div>
         </section>
       </main>

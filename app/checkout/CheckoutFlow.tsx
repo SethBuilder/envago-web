@@ -11,7 +11,7 @@ import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-
 import type { ApiActivityDetail, ApiSchedule } from "../lib/api";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8001";
+const API_URL = "";
 
 function formatDateLong(dateStr: string) {
   const d = new Date(dateStr + "T00:00:00");
