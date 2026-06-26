@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
+import LaraChat from "./components/LaraChat";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -59,6 +60,7 @@ export default function RootLayout({
         className={`${raleway.variable} font-sans antialiased bg-[#F7F5F2] text-[#111111]`}
       >
         {children}
+        <LaraChat />
       </body>
     </html>
   );
