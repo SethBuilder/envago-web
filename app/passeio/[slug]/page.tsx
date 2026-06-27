@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 import BookingWidget from "../../components/BookingWidget";
 import PhotoCarousel from "../../components/PhotoCarousel";
 import Navbar from "../../components/Navbar";
+import MobileStickyFooter from "../../components/MobileStickyFooter";
 
 function formatDuration(minutes: number) {
   const h = Math.floor(minutes / 60);
@@ -66,6 +67,12 @@ export default async function ActivityPage({
     ...activity.gallery,
   ].filter(Boolean) as string[];
 
+  const mapsUrl = activity.meeting_point_lat && activity.meeting_point_lng
+    ? `https://www.google.com/maps?q=${activity.meeting_point_lat},${activity.meeting_point_lng}`
+    : activity.meeting_point
+      ? `https://www.google.com/maps/search/${encodeURIComponent(activity.meeting_point)}`
+      : null;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "TouristTrip",
@@ -99,7 +106,8 @@ export default async function ActivityPage({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-20">
+      {/* pb-24 on mobile to clear the sticky footer */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-28 lg:pb-8">
         {/* Breadcrumb */}
         <nav className="text-xs text-[#999] mb-6 flex items-center gap-2">
           <Link href="/" className="hover:text-[#ff2924] transition-colors">Início</Link>
@@ -162,28 +170,23 @@ export default async function ActivityPage({
               </div>
             )}
 
-            {/* Provider */}
-            {activity.provider && (
-              <Link href={`/operadores/${activity.provider.slug}`} className="bg-[#F7F5F2] rounded-2xl p-5 flex items-center gap-4 hover:bg-[#f0ede8] transition-colors">
-                {activity.provider.logo_url ? (
-                  <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-[#E5E1DC]">
-                    <img
-                      src={activity.provider.logo_url}
-                      alt={activity.provider.business_name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-[#ff2924] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                    {activity.provider.business_name.charAt(0)}
-                  </div>
-                )}
-                <div className="flex-1">
-                  <p className="text-xs text-[#999] uppercase tracking-wide">Operador</p>
-                  <p className="font-semibold text-[#111]">{activity.provider.business_name}</p>
+            {/* Meeting point */}
+            {activity.meeting_point && (
+              <div className="bg-[#F7F5F2] rounded-2xl p-5 hidden lg:flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-white border border-[#E5E1DC] flex items-center justify-center flex-shrink-0 text-lg">
+                  📍
                 </div>
-                <span style={{color: '#aaa', fontSize: '18px'}}>›</span>
-              </Link>
+                <div className="flex-1">
+                  <p className="text-xs text-[#999] uppercase tracking-wide font-semibold mb-1">Ponto de encontro</p>
+                  <p className="text-sm text-[#111] font-medium">{activity.meeting_point}</p>
+                  {mapsUrl && (
+                    <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 mt-2 text-sm font-semibold text-[#111] border border-[#111] rounded-lg px-3 py-1.5 hover:bg-[#111] hover:text-white transition-colors">
+                      Ver no Google Maps ↗
+                    </a>
+                  )}
+                </div>
+              </div>
             )}
 
             {/* Reviews */}
@@ -223,19 +226,73 @@ export default async function ActivityPage({
                 </div>
               </div>
             )}
+            {/* Provider */}
+            {activity.provider && (
+              <Link href={`/operadores/${activity.provider.slug}`} className="bg-[#F7F5F2] rounded-2xl p-5 flex items-center gap-4 hover:bg-[#f0ede8] transition-colors">
+                {activity.provider.logo_url ? (
+                  <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-[#E5E1DC]">
+                    <img src={activity.provider.logo_url} alt={activity.provider.business_name} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-[#ff2924] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                    {activity.provider.business_name.charAt(0)}
+                  </div>
+                )}
+                <div className="flex-1">
+                  <p className="text-xs text-[#999] uppercase tracking-wide">Operador</p>
+                  <p className="font-semibold text-[#111]">{activity.provider.business_name}</p>
+                </div>
+                <span style={{color: '#aaa', fontSize: '18px'}}>›</span>
+              </Link>
+            )}
           </div>
 
-          {/* Right: booking widget */}
-          <div className="lg:col-span-1">
+          {/* Right: booking widget (desktop) */}
+          <div className="lg:col-span-1 hidden lg:block">
             <BookingWidget
+              price={activity.price}
+              schedules={activity.schedules}
+              activitySlug={activity.slug}
+              stripeReady={activity.provider?.booking_enabled ?? false}
+            />
+          </div>
+        </div>
+
+        {/* Mobile-only meeting point — shown just above widget when sticky footer scrolls here */}
+        {activity.meeting_point && (
+          <div className="lg:hidden mt-8 bg-[#F7F5F2] rounded-2xl p-5 flex items-start gap-4">
+            <div className="w-10 h-10 rounded-full bg-white border border-[#E5E1DC] flex items-center justify-center flex-shrink-0 text-lg">
+              📍
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-[#999] uppercase tracking-wide font-semibold mb-1">Ponto de encontro</p>
+              <p className="text-sm text-[#111] font-medium">{activity.meeting_point}</p>
+              {mapsUrl && (
+                <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 mt-2 text-sm font-semibold text-[#111] border border-[#111] rounded-lg px-3 py-1.5 hover:bg-[#111] hover:text-white transition-colors">
+                  Ver no Google Maps ↗
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Mobile booking widget (inline, below content) */}
+        <div className="lg:hidden mt-4" id="booking-widget-mobile">
+          <BookingWidget
             price={activity.price}
             schedules={activity.schedules}
             activitySlug={activity.slug}
             stripeReady={activity.provider?.booking_enabled ?? false}
           />
-          </div>
         </div>
       </main>
+
+      {/* Sticky mobile footer */}
+      <MobileStickyFooter
+        price={activity.price}
+        bookingEnabled={activity.provider?.booking_enabled ?? false}
+      />
     </>
   );
 }

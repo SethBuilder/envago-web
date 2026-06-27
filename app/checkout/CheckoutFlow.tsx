@@ -338,6 +338,13 @@ export default function CheckoutFlow({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [booking, setBooking] = useState<BookingData | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (window.innerWidth < 1024) {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
 
   const elementsOptions = booking?.client_secret
     ? {
@@ -459,7 +466,7 @@ export default function CheckoutFlow({
 
       <div className="max-w-5xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
         {/* Left: form */}
-        <div className="flex flex-col gap-6">
+        <div ref={formRef} className="flex flex-col gap-6 order-2 lg:order-1">
           {/* Step indicator */}
           <div className="flex items-center gap-3 text-sm">
             <div className={`flex items-center gap-2 font-semibold ${step === "contact" ? "text-[#111]" : "text-green-700"}`}>
@@ -533,7 +540,7 @@ export default function CheckoutFlow({
         </div>
 
         {/* Right: summary card */}
-        <div className="lg:sticky lg:top-8">
+        <div className="lg:sticky lg:top-8 order-1 lg:order-2">
           <SummaryCard activity={activity} schedule={schedule} seats={seats} priceNum={priceNum} />
         </div>
       </div>

@@ -1,18 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { ApiSchedule } from "../lib/api";
 
-function formatDate(dateStr: string) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  const d = new Date(dateStr + "T00:00:00");
+const MONTHS_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const DAYS_PT   = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+
+function toLocalDate(str: string) {
+  const [y, m, d] = str.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function dateKey(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function labelDate(str: string) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const tom   = new Date(today); tom.setDate(today.getDate()+1);
+  const d = toLocalDate(str);
   if (d.getTime() === today.getTime()) return "Hoje";
-  if (d.getTime() === tomorrow.getTime()) return "Amanhã";
-  return d.toLocaleDateString("pt-BR", { weekday: "short", day: "numeric", month: "short" });
+  if (d.getTime() === tom.getTime())   return "Amanhã";
+  return d.toLocaleDateString("pt-BR", { weekday:"long", day:"numeric", month:"long" });
 }
 
 export default function BookingWidget({ price, schedules, activitySlug, stripeReady = true }: {
@@ -29,21 +39,39 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
     acc[s.date].push(s);
     return acc;
   }, {});
-  const dates = Object.keys(byDate);
 
-  const firstAvailable = schedules.find((s) => s.seats_left > 0) ?? null;
-  const [selectedDate, setSelectedDate] = useState<string>(firstAvailable?.date ?? dates[0] ?? "");
-  const [selectedSchedule, setSelectedSchedule] = useState<ApiSchedule | null>(firstAvailable);
-  const [seats, setSeats] = useState(1);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayKey    = dateKey(today);
+  const tomorrowKey = dateKey(new Date(today.getTime() + 86400000));
+
+  const [selectedDate,     setSelectedDate]     = useState<string>("");
+  const [selectedSchedule, setSelectedSchedule] = useState<ApiSchedule | null>(null);
+  const [seats,            setSeats]            = useState(1);
+  const [calOpen,          setCalOpen]          = useState(false);
+  const calRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (calRef.current && !calRef.current.contains(e.target as Node)) {
+        setCalOpen(false);
+      }
+    }
+    if (calOpen) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [calOpen]);
+
+  // Calendar state
+  const [calMonth, setCalMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
 
   const maxSeats = selectedSchedule?.seats_left ?? 0;
-  const total = priceNum * seats;
+  const total    = priceNum * seats;
 
   function selectDate(date: string) {
     setSelectedDate(date);
-    const first = byDate[date].find((s) => s.seats_left > 0) ?? byDate[date][0];
+    const first = (byDate[date] ?? []).find((s) => s.seats_left > 0) ?? byDate[date]?.[0] ?? null;
     setSelectedSchedule(first);
     setSeats(1);
+    setCalOpen(false);
   }
 
   function goToCheckout() {
@@ -51,9 +79,29 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
     router.push(`/checkout?activity=${activitySlug}&schedule=${selectedSchedule.id}&seats=${seats}`);
   }
 
+  function prevMonth() {
+    setCalMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1));
+  }
+  function nextMonth() {
+    setCalMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1));
+  }
+
+  // Build calendar grid
+  function buildCalendarDays() {
+    const year  = calMonth.getFullYear();
+    const month = calMonth.getMonth();
+    const first = new Date(year, month, 1);
+    const last  = new Date(year, month + 1, 0);
+    const startDow = first.getDay(); // 0=Sun
+    const days: Array<Date | null> = [];
+    for (let i = 0; i < startDow; i++) days.push(null);
+    for (let d = 1; d <= last.getDate(); d++) days.push(new Date(year, month, d));
+    return days;
+  }
+
   if (!stripeReady || schedules.length === 0) {
     return (
-      <div className="bg-white border border-[#E5E1DC] rounded-2xl p-6 flex flex-col gap-4 sticky top-24 text-center">
+      <div id="booking-widget" className="bg-white border border-[#E5E1DC] rounded-2xl p-6 flex flex-col gap-4 sticky top-24 text-center">
         <div>
           <span className="text-3xl font-bold text-[#111]">R$ {priceNum.toFixed(0)}</span>
           <span className="text-[#666] text-sm"> /pessoa</span>
@@ -66,33 +114,82 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
     );
   }
 
+  const calDays = buildCalendarDays();
+
   return (
-    <div className="bg-white border border-[#E5E1DC] rounded-2xl p-6 flex flex-col gap-5 sticky top-24">
+    <div id="booking-widget" className="bg-white border border-[#E5E1DC] rounded-2xl p-6 flex flex-col gap-5 sticky top-24">
       <div>
         <span className="text-3xl font-bold text-[#111]">R$ {priceNum.toFixed(0)}</span>
         <span className="text-[#666] text-sm"> /pessoa</span>
       </div>
 
-      <div>
-        <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">Escolha a data</p>
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {dates.slice(0, 10).map((date) => {
-            const soldOut = byDate[date].every((s) => s.seats_left === 0);
-            return (
-              <button key={date} onClick={() => !soldOut && selectDate(date)} disabled={soldOut}
-                className={`flex-shrink-0 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
-                  soldOut ? "border-[#E5E1DC] text-[#ccc] cursor-not-allowed line-through"
-                  : selectedDate === date ? "bg-[#ff2924] text-white border-[#ff2924] cursor-pointer"
-                  : "border-[#E5E1DC] text-[#555] hover:border-[#ff2924] cursor-pointer"
-                }`}>
-                {formatDate(date)}
+      {/* Date picker */}
+      <div className="relative" ref={calRef}>
+        <button onClick={() => setCalOpen(o => !o)}
+          className="w-full flex items-center justify-between px-5 py-4 rounded-xl border-2 border-[#111] hover:bg-[#f9f9f9] transition-colors cursor-pointer bg-white">
+          <div className="flex items-center gap-3">
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-[#111] shrink-0">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span className={selectedDate ? "font-extrabold text-[#111] text-base" : "font-bold text-[#555] text-base"}>
+              {selectedDate
+                ? toLocalDate(selectedDate).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })
+                : "Escolha uma data"}
+            </span>
+          </div>
+          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
+            className={`text-[#111] transition-transform shrink-0 ${calOpen ? "rotate-180" : ""}`}>
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        {calOpen && (
+          <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white border border-[#E5E1DC] rounded-xl shadow-lg p-3">
+            <div className="flex items-center justify-between mb-4">
+              <button onClick={prevMonth} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#f5f5f5] text-[#555] cursor-pointer transition-colors">
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
               </button>
-            );
-          })}
-        </div>
+              <span className="text-base font-extrabold text-[#111] tracking-tight">{MONTHS_PT[calMonth.getMonth()]} {calMonth.getFullYear()}</span>
+              <button onClick={nextMonth} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#f5f5f5] text-[#555] cursor-pointer transition-colors">
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center">
+              {DAYS_PT.map(d => (
+                <div key={d} className="text-[11px] font-bold text-[#999] py-1">{d}</div>
+              ))}
+              {calDays.map((day, i) => {
+                if (!day) return <div key={`e-${i}`} />;
+                const key  = dateKey(day);
+                const past = day < today;
+                const hasSlots  = !!byDate[key];
+                const soldOut   = hasSlots && byDate[key].every(s => s.seats_left === 0);
+                const available = hasSlots && !soldOut;
+                const isSelected = selectedDate === key;
+                return (
+                  <button key={key}
+                    onClick={() => available && selectDate(key)}
+                    disabled={!available || past}
+                    className={`relative aspect-square rounded-xl text-sm font-bold transition-all cursor-pointer
+                      ${isSelected ? "bg-[#ff2924] text-white shadow-sm" :
+                        available ? "hover:bg-[#fff0f0] text-[#111]" :
+                        soldOut   ? "text-[#ccc] line-through cursor-not-allowed" :
+                        "text-[#ddd] cursor-default"}
+                    `}>
+                    {day.getDate()}
+                    {available && !isSelected && (
+                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#16a34a]" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
-      {selectedDate && (
+      {/* Time slots */}
+      {selectedDate && byDate[selectedDate] && (
         <div>
           <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">Horário</p>
           <div className="flex gap-2 flex-wrap">
@@ -113,19 +210,18 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
         </div>
       )}
 
-      {selectedSchedule && maxSeats > 0 && (
-        <div>
-          <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">Pessoas</p>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setSeats((s) => Math.max(1, s - 1))}
-              className="w-9 h-9 rounded-full border border-[#E5E1DC] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">−</button>
-            <span className="text-lg font-bold w-4 text-center">{seats}</span>
-            <button onClick={() => setSeats((s) => Math.min(maxSeats, s + 1))}
-              className="w-9 h-9 rounded-full border border-[#E5E1DC] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">+</button>
-            <span className="text-xs text-[#999]">máx. {maxSeats} disponíveis</span>
-          </div>
+      {/* Pax selector — always visible */}
+      <div>
+        <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">Pessoas</p>
+        <div className="flex items-center gap-4">
+          <button onClick={() => setSeats((s) => Math.max(1, s - 1))}
+            className="w-9 h-9 rounded-full border border-[#999] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">−</button>
+          <span className="text-lg font-bold w-4 text-center">{seats}</span>
+          <button onClick={() => setSeats((s) => Math.min(selectedSchedule ? maxSeats : 99, s + 1))}
+            className="w-9 h-9 rounded-full border border-[#999] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">+</button>
+          {selectedSchedule && <span className="text-xs text-[#999]">máx. {maxSeats}</span>}
         </div>
-      )}
+      </div>
 
       <div className="border-t border-[#F0EDE8] pt-4 flex flex-col gap-3">
         <div className="flex justify-between items-center text-sm">
@@ -133,8 +229,8 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
           <span className="font-bold text-[#111] text-base">R$ {total.toFixed(0)}</span>
         </div>
         <button
-          disabled={!selectedSchedule || maxSeats === 0}
-          onClick={goToCheckout}
+          disabled={maxSeats === 0 && !!selectedSchedule}
+          onClick={() => !selectedSchedule ? setCalOpen(true) : goToCheckout()}
           className="w-full bg-[#ff2924] text-white font-bold py-3 rounded-xl hover:bg-[#d41f1b] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
           Reservar agora
         </button>

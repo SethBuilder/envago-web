@@ -48,6 +48,9 @@ export interface ApiActivityDetail extends ApiActivity {
   description: string | null;
   capacity: number;
   gallery: string[];
+  meeting_point: string | null;
+  meeting_point_lat: number | null;
+  meeting_point_lng: number | null;
   reviews: {
     author_name: string;
     author_avatar_url: string | null;
