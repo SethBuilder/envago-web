@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "qr.stripe.com" },
       { protocol: "https", hostname: "api.envago.live" },
+
     ],
   },
   async redirects() {
@@ -31,6 +32,10 @@ const nextConfig: NextConfig = {
       {
         source: "/api/lara/:path*",
         destination: `${API_ORIGIN}/api/lara/:path*`,
+      },
+      {
+        source: "/storage/:path*",
+        destination: `${API_ORIGIN}/storage/:path*`,
       },
     ];
   },
