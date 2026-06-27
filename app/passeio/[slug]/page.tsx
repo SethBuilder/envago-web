@@ -65,11 +65,11 @@ export default async function ActivityPage({
   const photos = [
     activity.cover_url,
     ...activity.gallery,
-  ].filter(Boolean).map((url: string) =>
+  ].filter((url): url is string => Boolean(url)).map((url) =>
     url.startsWith("http://") && url.includes("/storage/")
       ? url.replace(/^https?:\/\/[^/]+\/storage\//, "/storage/")
       : url
-  ) as string[];
+  );
 
   const mapsUrl = activity.meeting_point_lat && activity.meeting_point_lng
     ? `https://www.google.com/maps?q=${activity.meeting_point_lat},${activity.meeting_point_lng}`
