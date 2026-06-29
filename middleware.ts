@@ -11,6 +11,7 @@ export function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
   if (pathname.startsWith("/em-breve")) return NextResponse.next();
+  if (pathname.startsWith("/parceiros")) return NextResponse.next();
 
   // Allow operator preview links through even in coming-soon mode
   if (searchParams.get("preview") === "true") return NextResponse.next();
