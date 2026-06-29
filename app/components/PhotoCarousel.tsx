@@ -20,12 +20,12 @@ export default function PhotoCarousel({
 
   const next = useCallback(() => {
     barKeyRef.current += 1;
-    setCurrent((c) => (c + 1) % n);
+    setCurrent((c) => (c + 1) % Math.max(n, 1));
   }, [n]);
 
   const prev = useCallback(() => {
     barKeyRef.current += 1;
-    setCurrent((c) => (c - 1 + n) % n);
+    setCurrent((c) => (c - 1 + Math.max(n, 1)) % Math.max(n, 1));
   }, [n]);
 
   // Auto-advance
@@ -46,7 +46,9 @@ export default function PhotoCarousel({
     touchStartX.current = null;
   }
 
-  if (n === 0) return null;
+  if (n === 0) {
+    return <div className="w-full aspect-[16/9] rounded-2xl bg-[#F0EDE8]" />;
+  }
 
   return (
     <div

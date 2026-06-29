@@ -129,11 +129,15 @@ export default function ProviderActivities({
             className="group bg-white rounded-2xl border border-[#E5E1DC] overflow-hidden hover:shadow-md transition-shadow"
           >
             <div className="aspect-[4/3] overflow-hidden bg-[#F7F5F2]">
-              <img
-                src={activity.cover_url ?? `https://picsum.photos/seed/${activity.slug}/400/300`}
-                alt={activity.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+              {activity.cover_url ? (
+                <img
+                  src={activity.cover_url}
+                  alt={activity.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              ) : (
+                <div className="w-full h-full bg-[#F0EDE8]" />
+              )}
             </div>
             <div className="p-4">
               {multiCategory && activity.category && (

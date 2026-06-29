@@ -41,14 +41,18 @@ export async function generateMetadata({
 
 export default async function OperadorPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }) {
   const { slug } = await params;
+  const { preview } = await searchParams;
+  const isPreview = preview === "true";
 
   let provider;
   try {
-    const res = await fetchProvider(slug);
+    const res = await fetchProvider(slug, isPreview);
     provider = res.data;
   } catch {
     notFound();
@@ -57,6 +61,11 @@ export default async function OperadorPage({
   return (
     <>
       <Navbar />
+      {isPreview && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center text-sm text-amber-800">
+          Pré-visualização — sua página ainda não está publicada. Ative sua conta para publicar.
+        </div>
+      )}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-10 pb-20">
         {/* Breadcrumb */}
         <nav className="text-xs text-[#999] mb-8 flex items-center gap-2">

@@ -71,6 +71,7 @@ export default async function ActivityPage({
       : url
   );
 
+
   const mapsUrl = activity.meeting_point_lat && activity.meeting_point_lng
     ? `https://www.google.com/maps?q=${activity.meeting_point_lat},${activity.meeting_point_lng}`
     : activity.meeting_point

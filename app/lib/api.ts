@@ -97,8 +97,9 @@ export async function fetchActivities(params?: {
   return res.json();
 }
 
-export async function fetchProvider(slug: string): Promise<{ data: ApiProvider }> {
-  const res = await fetch(`${API_URL}/api/v1/operadores/${slug}`, { next: { revalidate: 60 } });
+export async function fetchProvider(slug: string, preview = false): Promise<{ data: ApiProvider }> {
+  const url = `${API_URL}/api/v1/operadores/${slug}${preview ? "?preview=true" : ""}`;
+  const res = await fetch(url, { cache: preview ? "no-store" : undefined, next: preview ? undefined : { revalidate: 60 } });
   if (!res.ok) throw new Error("Provider not found");
   return res.json();
 }
