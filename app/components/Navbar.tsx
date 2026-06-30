@@ -1,14 +1,7 @@
-'use client';
-
 import Image from "next/image";
 import Link from "next/link";
-import SearchBar from "./SearchBar";
 
 export default function Navbar() {
-  function openLara() {
-    window.dispatchEvent(new Event('open-lara'));
-  }
-
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-[#E5E1DC]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
@@ -25,12 +18,12 @@ export default function Navbar() {
 
         <div className="flex-1" />
 
-        <button
-          onClick={openLara}
+        <a
+          href="https://painel.envago.live/parceiros"
           className="flex-shrink-0 text-sm font-semibold bg-[#ff2924] text-white px-4 py-2 rounded-full hover:bg-[#d41f1b] transition-colors"
         >
           Listar meu passeio
-        </button>
+        </a>
       </div>
     </header>
   );
