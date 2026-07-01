@@ -169,13 +169,29 @@ function SummaryCard({
   seats: number;
   priceNum: number;
 }) {
-  const coverUrl = activity.cover_url ?? `https://picsum.photos/seed/${activity.slug}/800/500`;
   const total = priceNum * seats;
+  const firstVideo = activity.videos?.[0];
 
   return (
     <div className="bg-white rounded-2xl border border-[#E5E1DC] overflow-hidden">
-      <div className="relative w-full aspect-[16/9]">
-        <Image src={coverUrl} alt={activity.name} fill className="object-cover" />
+      <div className="relative w-full aspect-[16/9] bg-[#F0EDE8]">
+        {activity.cover_url ? (
+          <Image src={activity.cover_url} alt={activity.name} fill className="object-cover" />
+        ) : firstVideo ? (
+          <video
+            src={firstVideo.url}
+            poster={firstVideo.poster_url ?? undefined}
+            autoPlay muted loop playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <svg width="40" height="40" fill="none" stroke="#C5BDB5" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </div>
+        )}
       </div>
       <div className="p-5 flex flex-col gap-4">
         <div>
@@ -335,6 +351,7 @@ export default function CheckoutFlow({
   const [step, setStep] = useState<"contact" | "payment" | "confirmed">("contact");
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
+  const [guestWhatsapp, setGuestWhatsapp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [booking, setBooking] = useState<BookingData | null>(null);
@@ -371,7 +388,7 @@ export default function CheckoutFlow({
       const res = await fetch(`${API_URL}/api/v1/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ schedule_id: schedule.id, seats, guest_name: guestName, guest_email: guestEmail }),
+        body: JSON.stringify({ schedule_id: schedule.id, seats, guest_name: guestName, guest_email: guestEmail, guest_whatsapp: guestWhatsapp || undefined }),
       });
       const json = await res.json();
       if (!res.ok) { setError(json.message ?? "Algo deu errado."); return; }
@@ -507,6 +524,18 @@ export default function CheckoutFlow({
                     placeholder="seu@email.com"
                     autoComplete="email" required
                     className="border-2 border-[#E5E1DC] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#ff2924] transition-colors placeholder:text-[#bbb]" />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="guest_whatsapp" className="text-sm font-semibold text-[#111]">
+                    WhatsApp <span className="text-[#999] font-normal">(opcional)</span>
+                  </label>
+                  <input id="guest_whatsapp" name="whatsapp" type="tel" value={guestWhatsapp}
+                    onChange={(e) => setGuestWhatsapp(e.target.value)}
+                    placeholder="(88) 99999-9999"
+                    autoComplete="tel"
+                    className="border-2 border-[#E5E1DC] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#ff2924] transition-colors placeholder:text-[#bbb]" />
+                  <p className="text-[11px] text-[#aaa]">O operador pode entrar em contato antes do passeio</p>
                 </div>
 
                 {error && <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">{error}</p>}

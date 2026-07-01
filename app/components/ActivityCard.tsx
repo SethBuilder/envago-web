@@ -17,7 +17,7 @@ export default function ActivityCard({ activity }: { activity: ApiActivity }) {
   return (
     <Link href={`/passeio/${activity.slug}`} className="block cursor-pointer group">
       <article className="bg-white rounded-2xl overflow-hidden shadow-sm group-hover:shadow-md transition-shadow border border-[#E5E1DC] flex flex-col">
-        {/* Photo */}
+        {/* Photo / Video */}
         <div className="relative aspect-[4/3] overflow-hidden bg-[#F0EDE8]">
           {activity.cover_url ? (
             <Image
@@ -26,6 +26,13 @@ export default function ActivityCard({ activity }: { activity: ApiActivity }) {
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : activity.first_video ? (
+            <video
+              src={activity.first_video.url}
+              poster={activity.first_video.poster_url ?? undefined}
+              autoPlay muted loop playsInline
+              className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">

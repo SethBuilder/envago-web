@@ -33,6 +33,7 @@ export interface ApiActivity {
   state: string;
   category: { id: number; name: string; slug: string } | null;
   cover_url: string | null;
+  first_video: { url: string; poster_url: string | null } | null;
   provider: { id: number; business_name: string; slug: string; logo_url: string | null; booking_enabled: boolean } | null;
   avg_rating: number | null;
   review_count: number;
