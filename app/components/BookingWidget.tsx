@@ -25,14 +25,18 @@ function labelDate(str: string) {
   return d.toLocaleDateString("pt-BR", { weekday:"long", day:"numeric", month:"long" });
 }
 
-export default function BookingWidget({ price, schedules, activitySlug, stripeReady = true }: {
+export default function BookingWidget({ price, pricingType = "per_person", pricingUnit, schedules, activitySlug, stripeReady = true }: {
   price: string;
+  pricingType?: "per_person" | "per_unit";
+  pricingUnit?: string | null;
   schedules: ApiSchedule[];
   activitySlug: string;
   stripeReady?: boolean;
 }) {
   const router = useRouter();
   const priceNum = Number(price);
+  const isPerUnit = pricingType === "per_unit";
+  const unitLabel = isPerUnit ? (pricingUnit ?? "grupo") : "pessoa";
 
   const byDate = schedules.reduce<Record<string, ApiSchedule[]>>((acc, s) => {
     if (!acc[s.date]) acc[s.date] = [];
@@ -46,7 +50,7 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
 
   const [selectedDate,     setSelectedDate]     = useState<string>("");
   const [selectedSchedule, setSelectedSchedule] = useState<ApiSchedule | null>(null);
-  const [seats,            setSeats]            = useState(1);
+  const [_seats,           setSeats]            = useState(1);
   const [calOpen,          setCalOpen]          = useState(false);
   const calRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +68,8 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
   const [calMonth, setCalMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
 
   const maxSeats = selectedSchedule?.seats_left ?? 0;
-  const total    = priceNum * seats;
+  const seats    = isPerUnit ? 1 : _seats;
+  const total    = isPerUnit ? priceNum : priceNum * seats;
 
   function selectDate(date: string) {
     setSelectedDate(date);
@@ -104,7 +109,7 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
       <div id="booking-widget" className="bg-white border border-[#E5E1DC] rounded-2xl p-6 flex flex-col gap-4 sticky top-24 text-center">
         <div>
           <span className="text-3xl font-bold text-[#111]">R$ {priceNum.toFixed(0)}</span>
-          <span className="text-[#666] text-sm"> /pessoa</span>
+          <span className="text-[#666] text-sm"> /{unitLabel}</span>
         </div>
         <div className="bg-[#fff8e1] rounded-xl p-4">
           <p className="font-semibold text-[#92400e] text-sm">Reservas em breve</p>
@@ -120,7 +125,7 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
     <div id="booking-widget" className="bg-white border border-[#E5E1DC] rounded-2xl p-6 flex flex-col gap-5 sticky top-24">
       <div>
         <span className="text-3xl font-bold text-[#111]">R$ {priceNum.toFixed(0)}</span>
-        <span className="text-[#666] text-sm"> /pessoa</span>
+        <span className="text-[#666] text-sm"> /{unitLabel}</span>
       </div>
 
       {/* Date picker */}
@@ -210,22 +215,28 @@ export default function BookingWidget({ price, schedules, activitySlug, stripeRe
         </div>
       )}
 
-      {/* Pax selector — always visible */}
-      <div>
-        <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">Pessoas</p>
-        <div className="flex items-center gap-4">
-          <button onClick={() => setSeats((s) => Math.max(1, s - 1))}
-            className="w-9 h-9 rounded-full border border-[#999] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">−</button>
-          <span className="text-lg font-bold w-4 text-center">{seats}</span>
-          <button onClick={() => setSeats((s) => Math.min(selectedSchedule ? maxSeats : 99, s + 1))}
-            className="w-9 h-9 rounded-full border border-[#999] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">+</button>
-          {selectedSchedule && <span className="text-xs text-[#999]">máx. {maxSeats}</span>}
+      {/* Pax selector — only for per_person */}
+      {!isPerUnit && (
+        <div>
+          <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">Pessoas</p>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setSeats((s) => Math.max(1, s - 1))}
+              className="w-9 h-9 rounded-full border border-[#999] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">−</button>
+            <span className="text-lg font-bold w-4 text-center">{_seats}</span>
+            <button onClick={() => setSeats((s) => Math.min(selectedSchedule ? maxSeats : 99, s + 1))}
+              className="w-9 h-9 rounded-full border border-[#999] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">+</button>
+            {selectedSchedule && <span className="text-xs text-[#999]">máx. {maxSeats}</span>}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="border-t border-[#F0EDE8] pt-4 flex flex-col gap-3">
         <div className="flex justify-between items-center text-sm">
-          <span className="text-[#666]">R$ {priceNum.toFixed(0)} × {seats} pessoa{seats > 1 ? "s" : ""}</span>
+          <span className="text-[#666]">
+            {isPerUnit
+              ? `1 ${unitLabel}`
+              : `R$ ${priceNum.toFixed(0)} × ${_seats} pessoa${_seats > 1 ? "s" : ""}`}
+          </span>
           <span className="font-bold text-[#111] text-base">R$ {total.toFixed(0)}</span>
         </div>
         <button

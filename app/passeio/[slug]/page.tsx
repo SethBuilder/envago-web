@@ -265,6 +265,8 @@ export default async function ActivityPage({
           <div className="lg:col-span-1 hidden lg:block">
             <BookingWidget
               price={activity.price}
+              pricingType={activity.pricing_type}
+              pricingUnit={activity.pricing_unit}
               schedules={activity.schedules}
               activitySlug={activity.slug}
               stripeReady={activity.provider?.booking_enabled ?? false}
@@ -295,6 +297,8 @@ export default async function ActivityPage({
         <div className="lg:hidden mt-4" id="booking-widget-mobile">
           <BookingWidget
             price={activity.price}
+            pricingType={activity.pricing_type}
+            pricingUnit={activity.pricing_unit}
             schedules={activity.schedules}
             activitySlug={activity.slug}
             stripeReady={activity.provider?.booking_enabled ?? false}
@@ -305,6 +309,7 @@ export default async function ActivityPage({
       {/* Sticky mobile footer */}
       <MobileStickyFooter
         price={activity.price}
+        pricingUnit={activity.pricing_type === "per_unit" ? (activity.pricing_unit ?? "grupo") : undefined}
         bookingEnabled={activity.provider?.booking_enabled ?? false}
       />
     </>

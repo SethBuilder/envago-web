@@ -1,7 +1,8 @@
 "use client";
 
-export default function MobileStickyFooter({ price, bookingEnabled }: {
+export default function MobileStickyFooter({ price, pricingUnit, bookingEnabled }: {
   price: string;
+  pricingUnit?: string | null;
   bookingEnabled: boolean;
 }) {
   function scrollToWidget() {
@@ -13,7 +14,7 @@ export default function MobileStickyFooter({ price, bookingEnabled }: {
       <div className="flex-1 min-w-0">
         <p className="text-xl font-bold text-[#111] leading-none">
           R$ {Number(price).toFixed(0)}
-          <span className="text-sm font-normal text-[#999] ml-1">/pessoa</span>
+          <span className="text-sm font-normal text-[#999] ml-1">/{pricingUnit ?? "pessoa"}</span>
         </p>
       </div>
       {bookingEnabled ? (

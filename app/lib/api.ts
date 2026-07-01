@@ -25,6 +25,8 @@ export interface ApiActivity {
   name: string;
   slug: string;
   price: string;
+  pricing_type: "per_person" | "per_unit";
+  pricing_unit: string | null;
   duration_minutes: number;
   city: string;
   state: string;
