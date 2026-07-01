@@ -11,7 +11,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   let name = "Passeio";
   let city = "Brasil";
   let price = "";
-  let photo = `https://picsum.photos/seed/${slug}/1200/630`;
+  let photo: string | null = null;
   let category = "";
 
   try {
@@ -20,17 +20,18 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     city = `${data.city}, ${data.state}`;
     price = `R$ ${Number(data.price).toFixed(0)}`;
     category = data.category?.name ?? "";
-    if (data.cover_url) photo = data.cover_url;
+    photo = data.cover_url ?? data.videos?.[0]?.poster_url ?? null;
   } catch {}
 
   return new ImageResponse(
     (
       <div style={{ width: 1200, height: 630, display: "flex", position: "relative" }}>
         {/* Background photo */}
-        <img
-          src={photo}
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-        />
+        {photo ? (
+          <img src={photo} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+        ) : (
+          <div style={{ position: "absolute", inset: 0, background: "#1a1a1a", display: "flex" }} />
+        )}
 
         {/* Gradient overlay — bottom heavy */}
         <div style={{
