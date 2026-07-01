@@ -267,6 +267,7 @@ export default async function ActivityPage({
               price={activity.price}
               pricingType={activity.pricing_type}
               pricingUnit={activity.pricing_unit}
+              unitCapacity={activity.unit_capacity}
               schedules={activity.schedules}
               activitySlug={activity.slug}
               stripeReady={activity.provider?.booking_enabled ?? false}

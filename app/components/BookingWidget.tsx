@@ -25,10 +25,11 @@ function labelDate(str: string) {
   return d.toLocaleDateString("pt-BR", { weekday:"long", day:"numeric", month:"long" });
 }
 
-export default function BookingWidget({ price, pricingType = "per_person", pricingUnit, schedules, activitySlug, stripeReady = true }: {
+export default function BookingWidget({ price, pricingType = "per_person", pricingUnit, unitCapacity, schedules, activitySlug, stripeReady = true }: {
   price: string;
   pricingType?: "per_person" | "per_unit";
   pricingUnit?: string | null;
+  unitCapacity?: number | null;
   schedules: ApiSchedule[];
   activitySlug: string;
   stripeReady?: boolean;
@@ -110,6 +111,9 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
         <div>
           <span className="text-3xl font-bold text-[#111]">R$ {priceNum.toFixed(0)}</span>
           <span className="text-[#666] text-sm"> /{unitLabel}</span>
+          {isPerUnit && unitCapacity && (
+            <span className="text-[#999] text-xs ml-2">até {unitCapacity} pessoas</span>
+          )}
         </div>
         <div className="bg-[#fff8e1] rounded-xl p-4">
           <p className="font-semibold text-[#92400e] text-sm">Reservas em breve</p>
@@ -126,6 +130,9 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
       <div>
         <span className="text-3xl font-bold text-[#111]">R$ {priceNum.toFixed(0)}</span>
         <span className="text-[#666] text-sm"> /{unitLabel}</span>
+        {isPerUnit && unitCapacity && (
+          <span className="text-[#999] text-xs ml-2">até {unitCapacity} pessoas</span>
+        )}
       </div>
 
       {/* Date picker */}
