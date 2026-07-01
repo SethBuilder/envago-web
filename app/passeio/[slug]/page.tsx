@@ -5,7 +5,7 @@ import { fetchActivity } from "../../lib/api";
 
 export const dynamic = "force-dynamic";
 import BookingWidget from "../../components/BookingWidget";
-import PhotoCarousel from "../../components/PhotoCarousel";
+import MediaCarousel from "../../components/MediaCarousel";
 import Navbar from "../../components/Navbar";
 import MobileStickyFooter from "../../components/MobileStickyFooter";
 
@@ -62,14 +62,23 @@ export default async function ActivityPage({
     notFound();
   }
 
-  const photos = [
-    activity.cover_url,
-    ...activity.gallery,
-  ].filter((url): url is string => Boolean(url)).map((url) =>
-    url.startsWith("http://") && url.includes("/storage/")
+  function normalizeUrl(url: string): string {
+    return url.startsWith("http://") && url.includes("/storage/")
       ? url.replace(/^https?:\/\/[^/]+\/storage\//, "/storage/")
-      : url
-  );
+      : url;
+  }
+
+  // Build unified media array: photos first (cover + gallery), then videos
+  const mediaItems = [
+    ...[activity.cover_url, ...activity.gallery]
+      .filter((url): url is string => Boolean(url))
+      .map((url) => ({ type: "photo" as const, url: normalizeUrl(url), poster_url: null })),
+    ...(activity.videos ?? []).map((v) => ({
+      type: "video" as const,
+      url: normalizeUrl(v.url),
+      poster_url: v.poster_url,
+    })),
+  ];
 
 
   const mapsUrl = activity.meeting_point_lat && activity.meeting_point_lng
@@ -84,7 +93,7 @@ export default async function ActivityPage({
     name: activity.name,
     description: activity.description ?? undefined,
     url: `https://envago.live/passeio/${activity.slug}`,
-    image: photos[0] ?? undefined,
+    image: mediaItems[0]?.url ?? undefined,
     touristType: activity.category?.name ?? undefined,
     offers: {
       "@type": "Offer",
@@ -125,8 +134,8 @@ export default async function ActivityPage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Left: content */}
           <div className="lg:col-span-2 flex flex-col gap-8">
-            {/* Photo carousel */}
-            <PhotoCarousel photos={photos} alt={activity.name} />
+            {/* Media carousel */}
+            <MediaCarousel items={mediaItems} alt={activity.name} />
 
             {/* Title + meta */}
             <div>

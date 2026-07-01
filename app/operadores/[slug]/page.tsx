@@ -23,6 +23,8 @@ export async function generateMetadata({
       title,
       description,
       alternates: { canonical: url },
+      // Keep unapproved pages out of search indexes
+      robots: data.is_approved ? undefined : { index: false, follow: false },
       openGraph: {
         title,
         description,
@@ -41,18 +43,14 @@ export async function generateMetadata({
 
 export default async function OperadorPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ preview?: string }>;
 }) {
   const { slug } = await params;
-  const { preview } = await searchParams;
-  const isPreview = preview === "true";
 
   let provider;
   try {
-    const res = await fetchProvider(slug, isPreview);
+    const res = await fetchProvider(slug);
     provider = res.data;
   } catch {
     notFound();
@@ -61,9 +59,15 @@ export default async function OperadorPage({
   return (
     <>
       <Navbar />
-      {isPreview && (
-        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center text-sm text-amber-800">
-          Pré-visualização — sua página ainda não está publicada. Ative sua conta para publicar.
+      {!provider.is_approved && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-3">
+          <div className="max-w-5xl mx-auto flex items-center gap-3 text-amber-800">
+            <span className="text-lg flex-shrink-0">🕐</span>
+            <div>
+              <span className="font-semibold text-sm">Página em análise</span>
+              <span className="text-sm text-amber-700"> — Esta página ainda está sendo analisada pela equipe do Envago. As reservas estarão disponíveis em breve.</span>
+            </div>
+          </div>
         </div>
       )}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-10 pb-20">

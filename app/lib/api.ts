@@ -15,6 +15,7 @@ export interface ApiProvider {
   business_name: string;
   slug: string;
   logo_url: string | null;
+  is_approved: boolean;
   booking_enabled: boolean;
   activities: ApiActivity[];
 }
@@ -44,10 +45,16 @@ export interface ApiSchedule {
   seats_left: number;
 }
 
+export interface ApiVideo {
+  url: string;
+  poster_url: string | null;
+}
+
 export interface ApiActivityDetail extends ApiActivity {
   description: string | null;
   capacity: number;
   gallery: string[];
+  videos: ApiVideo[];
   meeting_point: string | null;
   meeting_point_lat: number | null;
   meeting_point_lng: number | null;
@@ -97,9 +104,9 @@ export async function fetchActivities(params?: {
   return res.json();
 }
 
-export async function fetchProvider(slug: string, preview = false): Promise<{ data: ApiProvider }> {
-  const url = `${API_URL}/api/v1/operadores/${slug}${preview ? "?preview=true" : ""}`;
-  const res = await fetch(url, { cache: preview ? "no-store" : undefined, next: preview ? undefined : { revalidate: 60 } });
+export async function fetchProvider(slug: string): Promise<{ data: ApiProvider }> {
+  const url = `${API_URL}/api/v1/operadores/${slug}`;
+  const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error("Provider not found");
   return res.json();
 }
