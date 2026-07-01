@@ -135,6 +135,13 @@ export default function ProviderActivities({
                   alt={activity.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+              ) : activity.first_video ? (
+                <video
+                  src={activity.first_video.url}
+                  poster={activity.first_video.poster_url ?? undefined}
+                  autoPlay muted loop playsInline
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <div className="w-full h-full bg-[#F0EDE8]" />
               )}
