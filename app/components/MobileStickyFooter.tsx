@@ -1,13 +1,30 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 export default function MobileStickyFooter({ price, pricingUnit, bookingEnabled }: {
   price: string;
   pricingUnit?: string | null;
   bookingEnabled: boolean;
 }) {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const target = document.getElementById("booking-widget-mobile");
+    if (!target) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(!entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
+
   function scrollToWidget() {
     document.getElementById("booking-widget-mobile")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  if (!visible) return null;
 
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[#E5E1DC] px-4 py-3 flex items-center gap-3 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
