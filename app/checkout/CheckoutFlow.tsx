@@ -558,9 +558,8 @@ export default function CheckoutFlow({
               </form>
 
               <p className="text-[11px] text-[#bbb] text-center mt-4">
-                Ao continuar você concorda com nossos{" "}
-                <span className="underline cursor-pointer">Termos de uso</span> e{" "}
-                <span className="underline cursor-pointer">Política de privacidade</span>.
+                Ao continuar você concorda com nossa{" "}
+                <a href="/privacy" target="_blank" className="underline hover:text-[#111] transition-colors">Política de privacidade</a>.
               </p>
             </div>
           )}

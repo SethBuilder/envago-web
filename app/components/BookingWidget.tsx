@@ -78,7 +78,7 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
     setSelectedDate(date);
     const first = (byDate[date] ?? []).find((s) => s.seats_left > 0) ?? byDate[date]?.[0] ?? null;
     setSelectedSchedule(first);
-    setSeats(1);
+    if (first) setSeats(s => Math.max(1, Math.min(s, first.seats_left)));
     setCalOpen(false);
   }
 
@@ -112,9 +112,9 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
       <div id="booking-widget" className="bg-white border border-[#E5E1DC] rounded-2xl p-6 flex flex-col gap-4 sticky top-24 text-center">
         <div>
           <span className="text-3xl font-bold text-[#111]">R$ {priceNum.toFixed(0)}</span>
-          <span className="text-[#666] text-sm"> /{unitLabel}</span>
+          <span className="text-[#444] text-sm font-medium"> /{unitLabel}</span>
           {isPerUnit && unitCapacity && (
-            <span className="text-[#666] text-sm"> · até {seats * unitCapacity} pessoas</span>
+            <span className="text-[#444] text-sm font-medium"> · até {seats * unitCapacity} pessoas</span>
           )}
         </div>
         <div className="bg-[#fff8e1] rounded-xl p-4">
@@ -208,7 +208,7 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
           <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">Horário</p>
           <div className="flex gap-2 flex-wrap">
             {byDate[selectedDate].map((s) => (
-              <button key={s.id} onClick={() => { setSelectedSchedule(s); setSeats(1); }} disabled={s.seats_left === 0}
+              <button key={s.id} onClick={() => { setSelectedSchedule(s); setSeats(prev => Math.max(1, Math.min(prev, s.seats_left))); }} disabled={s.seats_left === 0}
                 className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
                   s.seats_left === 0 ? "border-[#E5E1DC] text-[#bbb] cursor-not-allowed"
                   : selectedSchedule?.id === s.id ? "bg-[#ff2924] text-white border-[#ff2924] cursor-pointer"
@@ -238,13 +238,13 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
           {selectedSchedule && <span className="text-xs text-[#999]">máx. {maxSeats}</span>}
         </div>
         {isPerUnit && totalPeople && seats > 1 && (
-          <p className="text-xs text-[#999] mt-2">até {totalPeople} pessoas no total</p>
+          <p className="text-sm text-[#444] font-medium mt-2">até {totalPeople} pessoas no total</p>
         )}
       </div>
 
       <div className="border-t border-[#F0EDE8] pt-4 flex flex-col gap-3">
         <div className="flex justify-between items-center text-sm">
-          <span className="text-[#666]">
+          <span className="text-[#444] font-medium">
             R$ {priceNum.toFixed(0)} × {_seats} {_seats > 1 ? unitPlural : unitLabel}
           </span>
           <span className="font-bold text-[#111] text-base">R$ {total.toFixed(0)}</span>
