@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import Script from "next/script";
 import { fetchActivity } from "../../lib/api";
 
 export const dynamic = "force-dynamic";
@@ -119,6 +120,9 @@ export default async function ActivityPage({
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Script id="gtag-conversion-trip" strategy="afterInteractive">
+        {`gtag('event', 'conversion', { 'send_to': 'AW-18282842253/lH1hCOCqqskcEI2R-I1E', 'value': ${Number(activity.price).toFixed(2)}, 'currency': 'BRL' });`}
+      </Script>
       <Navbar />
       {/* pb-24 on mobile to clear the sticky footer */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-28 lg:pb-8">

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Script from "next/script";
 import { fetchActivity } from "../lib/api";
 import CheckoutFlow from "./CheckoutFlow";
 
@@ -29,5 +30,14 @@ export default async function CheckoutPage({
   const schedule = activity.schedules.find((s) => s.id === scheduleId);
   if (!schedule) redirect(`/passeio/${slug}`);
 
-  return <CheckoutFlow activity={activity} schedule={schedule} seats={seats} />;
+  const checkoutTotal = (Number(activity.price) * seats).toFixed(2);
+
+  return (
+    <>
+      <Script id="gtag-conversion-checkout" strategy="afterInteractive">
+        {`gtag('event', 'conversion', { 'send_to': 'AW-18282842253/hykQCOHVq8kcEI2R-I1E', 'value': ${checkoutTotal}, 'currency': 'BRL' });`}
+      </Script>
+      <CheckoutFlow activity={activity} schedule={schedule} seats={seats} />
+    </>
+  );
 }
