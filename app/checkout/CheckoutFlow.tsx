@@ -27,7 +27,7 @@ interface BookingData {
   total_price: string;
   status: string;
   client_secret: string;
-  activity: { name: string; slug: string; city: string };
+  activity: { name: string; slug: string; city: string; pricing_type: string; pricing_unit: string | null };
   date: string;
   time: string;
 }
@@ -96,7 +96,7 @@ async function buildPDF(booking: BookingData, dateLong: string): Promise<jsPDF> 
     ["Passeio",  booking.activity.name],
     ["Data",     dateLong],
     ["Horário",  booking.time],
-    ["Pessoas",  String(booking.seats)],
+    [booking.activity.pricing_type === "per_unit" ? (booking.activity.pricing_unit ?? "unidade") + "s" : "Pessoas", String(booking.seats)],
     ["Nome",     booking.guest_name],
     ["E-mail",   booking.guest_email],
     ["Total pago", `R$ ${Number(booking.total_price).toFixed(0)}`],
@@ -163,12 +163,19 @@ function SummaryCard({
   schedule,
   seats,
   priceNum,
+  pricingType,
+  pricingUnit,
 }: {
   activity: ApiActivityDetail;
   schedule: ApiSchedule;
   seats: number;
   priceNum: number;
+  pricingType?: string;
+  pricingUnit?: string | null;
 }) {
+  const isPerUnit  = pricingType === "per_unit";
+  const unitLabel  = isPerUnit ? (pricingUnit ?? "unidade") : "pessoa";
+  const unitPlural = isPerUnit ? `${unitLabel}s` : "pessoas";
   const total = priceNum * seats;
   const firstVideo = activity.videos?.[0];
 
@@ -216,13 +223,13 @@ function SummaryCard({
           </div>
           <div className="flex items-start gap-3">
             <span className="text-[#999] text-sm w-5 mt-0.5">👤</span>
-            <span className="text-sm text-[#111] font-medium">{seats} pessoa{seats > 1 ? "s" : ""}</span>
+            <span className="text-sm text-[#111] font-medium">{seats} {seats > 1 ? unitPlural : unitLabel}</span>
           </div>
         </div>
 
         <div className="border-t border-[#F0EDE8] pt-4 flex flex-col gap-1.5">
           <div className="flex justify-between text-sm text-[#666]">
-            <span>R$ {priceNum.toFixed(0)} × {seats} pessoa{seats > 1 ? "s" : ""}</span>
+            <span>R$ {priceNum.toFixed(0)} × {seats} {seats > 1 ? unitPlural : unitLabel}</span>
             <span>R$ {total.toFixed(0)}</span>
           </div>
           <div className="flex justify-between font-bold text-[#111]">
@@ -580,7 +587,7 @@ export default function CheckoutFlow({
 
         {/* Right: summary card */}
         <div className="lg:sticky lg:top-8 order-1 lg:order-2">
-          <SummaryCard activity={activity} schedule={schedule} seats={seats} priceNum={priceNum} />
+          <SummaryCard activity={activity} schedule={schedule} seats={seats} priceNum={priceNum} pricingType={activity.pricing_type} pricingUnit={activity.pricing_unit} />
         </div>
       </div>
     </div>
