@@ -68,9 +68,11 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
   // Calendar state
   const [calMonth, setCalMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
 
-  const maxSeats = selectedSchedule?.seats_left ?? 0;
-  const seats    = isPerUnit ? 1 : _seats;
-  const total    = isPerUnit ? priceNum : priceNum * seats;
+  const maxSeats      = selectedSchedule?.seats_left ?? 0;
+  const seats         = _seats;
+  const total         = priceNum * seats;
+  const unitPlural    = isPerUnit ? `${unitLabel}s` : "pessoas";
+  const totalPeople   = isPerUnit && unitCapacity ? seats * unitCapacity : null;
 
   function selectDate(date: string) {
     setSelectedDate(date);
@@ -112,7 +114,7 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
           <span className="text-3xl font-bold text-[#111]">R$ {priceNum.toFixed(0)}</span>
           <span className="text-[#666] text-sm"> /{unitLabel}</span>
           {isPerUnit && unitCapacity && (
-            <span className="text-[#999] text-xs ml-2">até {unitCapacity} pessoas</span>
+            <span className="text-[#666] text-sm"> · até {seats * unitCapacity} pessoas</span>
           )}
         </div>
         <div className="bg-[#fff8e1] rounded-xl p-4">
@@ -131,7 +133,7 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
         <span className="text-3xl font-bold text-[#111]">R$ {priceNum.toFixed(0)}</span>
         <span className="text-[#666] text-sm"> /{unitLabel}</span>
         {isPerUnit && unitCapacity && (
-          <span className="text-[#999] text-xs ml-2">até {unitCapacity} pessoas</span>
+          <span className="text-[#666] text-sm"> · até {unitCapacity} pessoas</span>
         )}
       </div>
 
@@ -222,27 +224,28 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
         </div>
       )}
 
-      {/* Pax selector — only for per_person */}
-      {!isPerUnit && (
-        <div>
-          <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">Pessoas</p>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setSeats((s) => Math.max(1, s - 1))}
-              className="w-9 h-9 rounded-full border border-[#999] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">−</button>
-            <span className="text-lg font-bold w-4 text-center">{_seats}</span>
-            <button onClick={() => setSeats((s) => Math.min(selectedSchedule ? maxSeats : 99, s + 1))}
-              className="w-9 h-9 rounded-full border border-[#999] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">+</button>
-            {selectedSchedule && <span className="text-xs text-[#999]">máx. {maxSeats}</span>}
-          </div>
+      {/* Pax / unit selector */}
+      <div>
+        <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">
+          {isPerUnit ? unitPlural.charAt(0).toUpperCase() + unitPlural.slice(1) : "Pessoas"}
+        </p>
+        <div className="flex items-center gap-4">
+          <button onClick={() => setSeats((s) => Math.max(1, s - 1))}
+            className="w-9 h-9 rounded-full border border-[#999] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">−</button>
+          <span className="text-lg font-bold w-4 text-center">{_seats}</span>
+          <button onClick={() => setSeats((s) => Math.min(selectedSchedule ? maxSeats : 99, s + 1))}
+            className="w-9 h-9 rounded-full border border-[#999] text-xl font-bold hover:border-[#ff2924] transition-all cursor-pointer">+</button>
+          {selectedSchedule && <span className="text-xs text-[#999]">máx. {maxSeats}</span>}
         </div>
-      )}
+        {isPerUnit && totalPeople && seats > 1 && (
+          <p className="text-xs text-[#999] mt-2">até {totalPeople} pessoas no total</p>
+        )}
+      </div>
 
       <div className="border-t border-[#F0EDE8] pt-4 flex flex-col gap-3">
         <div className="flex justify-between items-center text-sm">
           <span className="text-[#666]">
-            {isPerUnit
-              ? `1 ${unitLabel}`
-              : `R$ ${priceNum.toFixed(0)} × ${_seats} pessoa${_seats > 1 ? "s" : ""}`}
+            R$ {priceNum.toFixed(0)} × {_seats} {_seats > 1 ? unitPlural : unitLabel}
           </span>
           <span className="font-bold text-[#111] text-base">R$ {total.toFixed(0)}</span>
         </div>
