@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { fetchActivities, type ApiActivity, type ApiCategory } from "../lib/api";
 import { categories } from "../data";
@@ -12,12 +13,15 @@ export default function Feed({
   initialActivities,
   initialMeta,
   apiCategories,
+  initialCategory = "todos",
 }: {
   initialActivities: ApiActivity[];
   initialMeta: Meta;
   apiCategories: ApiCategory[];
+  initialCategory?: string;
 }) {
-  const [active, setActive] = useState("todos");
+  const router = useRouter();
+  const [active, setActive] = useState(initialCategory);
   const [activities, setActivities] = useState(initialActivities);
   const [meta, setMeta] = useState(initialMeta);
   const [isPending, startTransition] = useTransition();
@@ -30,6 +34,7 @@ export default function Feed({
 
   function changeCategory(slug: string) {
     setActive(slug);
+    router.replace(slug === "todos" ? "/" : `/?categoria=${slug}`, { scroll: false });
     startTransition(async () => {
       const { data, meta } = await fetchActivities({ category: slug });
       setActivities(data);

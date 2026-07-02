@@ -56,8 +56,30 @@ export default async function OperadorPage({
     notFound();
   }
 
+  const city    = provider.activities[0]?.city;
+  const state   = provider.activities[0]?.state;
+  const category = provider.activities[0]?.category?.name;
+
+  const localBusinessLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: provider.business_name,
+    url: `https://envago.live/operadores/${slug}`,
+    image: provider.logo_url ?? "https://envago.live/design/logo-novo.svg",
+    ...(city ? {
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: city,
+        ...(state ? { addressRegion: state } : {}),
+        addressCountry: "BR",
+      },
+    } : {}),
+    ...(category ? { description: `Operador de ${category} no Envago.` } : {}),
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessLd) }} />
       <Navbar />
       {!provider.is_approved && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-3">

@@ -227,7 +227,9 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
       {/* Pax / unit selector */}
       <div>
         <p className="text-xs font-bold text-[#111] uppercase tracking-wide mb-2">
-          {isPerUnit ? unitPlural.charAt(0).toUpperCase() + unitPlural.slice(1) : "Pessoas"}
+          {isPerUnit
+            ? (_seats === 1 ? unitLabel.charAt(0).toUpperCase() + unitLabel.slice(1) : unitPlural.charAt(0).toUpperCase() + unitPlural.slice(1))
+            : "Pessoas"}
         </p>
         <div className="flex items-center gap-4">
           <button onClick={() => setSeats((s) => Math.max(1, s - 1))}

@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "qr.stripe.com" },
       { protocol: "https", hostname: "api.envago.live" },
+      { protocol: "http", hostname: "localhost" },
       { protocol: "https", hostname: "envago-media.s3.sa-east-1.amazonaws.com" },
     ],
   },

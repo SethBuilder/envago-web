@@ -117,9 +117,25 @@ export default async function ActivityPage({
     } : {}),
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Início", item: "https://envago.live" },
+      ...(activity.category ? [{
+        "@type": "ListItem",
+        position: 2,
+        name: activity.category.name,
+        item: `https://envago.live/?categoria=${activity.category.slug}`,
+      }] : []),
+      { "@type": "ListItem", position: activity.category ? 3 : 2, name: activity.name },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <Script id="gtag-conversion-trip" strategy="afterInteractive">
         {`gtag('event', 'conversion', { 'send_to': 'AW-18282842253/lH1hCOCqqskcEI2R-I1E', 'value': ${Number(activity.price).toFixed(2)}, 'currency': 'BRL' });`}
       </Script>
@@ -130,7 +146,13 @@ export default async function ActivityPage({
         <nav className="text-xs text-[#999] mb-6 flex items-center gap-2">
           <Link href="/" className="hover:text-[#ff2924] transition-colors">Início</Link>
           <span>/</span>
-          <span>{activity.category?.name ?? "Passeios"}</span>
+          {activity.category ? (
+            <Link href={`/?categoria=${activity.category.slug}`} className="hover:text-[#ff2924] transition-colors">
+              {activity.category.name}
+            </Link>
+          ) : (
+            <span>Passeios</span>
+          )}
           <span>/</span>
           <span className="text-[#111]">{activity.name}</span>
         </nav>

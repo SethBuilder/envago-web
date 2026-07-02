@@ -5,9 +5,16 @@ import { fetchActivities, fetchCategories } from "./lib/api";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { categoria } = await searchParams;
+  const initialCategory = typeof categoria === "string" ? categoria : "todos";
+
   const [{ data: initialActivities, meta }, apiCategories] = await Promise.all([
-    fetchActivities(),
+    fetchActivities({ category: initialCategory }),
     fetchCategories(),
   ]);
 
@@ -18,10 +25,11 @@ export default async function Home() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "WebSite",
+            "@type": "Organization",
             name: "Envago",
             url: "https://envago.live",
-            description: "Reserve passeios e aventuras no Brasil.",
+            logo: "https://envago.live/design/logo-novo.svg",
+            description: "Marketplace de passeios e experiências de viagem no Brasil.",
           }),
         }}
       />
@@ -41,7 +49,7 @@ export default async function Home() {
           </p>
         </div>
 
-        <Feed initialActivities={initialActivities} initialMeta={meta} apiCategories={apiCategories} />
+        <Feed initialActivities={initialActivities} initialMeta={meta} apiCategories={apiCategories} initialCategory={initialCategory} />
 
         <section id="como-funciona" className="mt-20 max-w-7xl mx-auto px-4 sm:px-6">
           <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#E5E1DC]">
