@@ -165,17 +165,22 @@ export default async function ActivityPage({
               </p>
             </div>
 
-            {/* Quick info chips */}
-            <div className="flex flex-wrap gap-3">
+            {/* Quick info cards */}
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { icon: "⏱", label: formatDuration(activity.duration_minutes) },
-                { icon: "👥", label: `Até ${activity.capacity} pessoas` },
-                { icon: "🏷️", label: `A partir de R$ ${Number(activity.price).toFixed(0)}` },
-                { icon: "📍", label: `${activity.city}, ${activity.state}` },
-              ].map((chip) => (
-                <div key={chip.label} className="flex items-center gap-2 bg-[#F7F5F2] px-4 py-2 rounded-full text-sm text-[#444]">
-                  <span>{chip.icon}</span>
-                  <span className="font-medium">{chip.label}</span>
+                { icon: "⏱", title: "Duração", value: formatDuration(activity.duration_minutes) },
+                { icon: "👥", title: "Capacidade", value: activity.pricing_type === "per_unit" && activity.unit_capacity && activity.pricing_unit
+                    ? `Até ${activity.unit_capacity} pessoas por ${activity.pricing_unit}`
+                    : `Até ${activity.capacity} pessoas` },
+                { icon: "🏷️", title: "Preço", value: `A partir de R$ ${Number(activity.price).toFixed(0)}` },
+                { icon: "📍", title: "Local", value: `${activity.city}, ${activity.state}` },
+              ].map((card) => (
+                <div key={card.title} className="flex items-start gap-3 bg-white border border-[#E5E1DC] rounded-2xl px-4 py-4">
+                  <span className="text-2xl leading-none mt-0.5">{card.icon}</span>
+                  <div>
+                    <p className="text-xs text-[#999] font-semibold uppercase tracking-wide">{card.title}</p>
+                    <p className="text-sm font-bold text-[#111] mt-0.5 leading-snug">{card.value}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -304,6 +309,7 @@ export default async function ActivityPage({
             price={activity.price}
             pricingType={activity.pricing_type}
             pricingUnit={activity.pricing_unit}
+            unitCapacity={activity.unit_capacity}
             schedules={activity.schedules}
             activitySlug={activity.slug}
             stripeReady={activity.provider?.booking_enabled ?? false}
