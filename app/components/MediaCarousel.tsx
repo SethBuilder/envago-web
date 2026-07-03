@@ -9,6 +9,7 @@ type MediaItem = {
   type: "photo" | "video";
   url: string;
   poster_url: string | null;
+  instagram_handle?: string | null;
 };
 
 export default function MediaCarousel({
@@ -21,16 +22,19 @@ export default function MediaCarousel({
   const n = items.length;
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [muted, setMuted] = useState(true);
   const touchStartX = useRef<number | null>(null);
   const barKeyRef = useRef(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const next = useCallback(() => {
+    videoRef.current?.pause();
     barKeyRef.current += 1;
     setCurrent((c) => (c + 1) % Math.max(n, 1));
   }, [n]);
 
   const prev = useCallback(() => {
+    videoRef.current?.pause();
     barKeyRef.current += 1;
     setCurrent((c) => (c - 1 + Math.max(n, 1)) % Math.max(n, 1));
   }, [n]);
@@ -52,6 +56,11 @@ export default function MediaCarousel({
       videoRef.current.play().catch(() => {});
     }
   }, [current, isVideo]);
+
+  // React's `muted` prop doesn't update the DOM property after mount
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.muted = muted;
+  }, [muted]);
 
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
@@ -85,15 +94,30 @@ export default function MediaCarousel({
           }`}
         >
           {item.type === "video" ? (
-            <video
-              ref={i === current ? videoRef : undefined}
-              src={item.url}
-              poster={item.poster_url ?? undefined}
-              className="w-full h-full object-cover"
-              playsInline
-              muted
-              onEnded={next}
-            />
+            <div className="relative w-full h-full bg-black">
+              {item.poster_url && (
+                <img
+                  src={item.poster_url}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl"
+                />
+              )}
+              <div className="absolute inset-0 bg-black/40" />
+              <video
+                ref={i === current ? videoRef : undefined}
+                src={item.url}
+                poster={item.poster_url ?? undefined}
+                className="relative w-full h-full object-contain"
+                playsInline
+                muted={muted}
+                preload="auto"
+                loop={n === 1}
+                onEnded={n > 1 ? next : undefined}
+                onStalled={n > 1 ? () => setTimeout(next, 3000) : undefined}
+                onError={n > 1 ? next : undefined}
+              />
+            </div>
           ) : (
             <Image
               src={item.url}
@@ -160,6 +184,42 @@ export default function MediaCarousel({
             </span>
           </button>
         </>
+      )}
+
+      {/* Instagram attribution */}
+      {currentItem?.instagram_handle && (
+        <div className="absolute top-10 right-3 z-10 flex items-center gap-1.5 bg-black/40 rounded-full px-2.5 py-1">
+          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#FCAF45"/>
+                <stop offset="50%" stopColor="#FD1D1D"/>
+                <stop offset="100%" stopColor="#833AB4"/>
+              </linearGradient>
+            </defs>
+            <path fill="url(#ig-grad)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+          </svg>
+          <span className="text-white text-xs font-medium">{currentItem.instagram_handle}</span>
+        </div>
+      )}
+
+      {/* Mute/unmute toggle — bottom-right above counter, only on video slides */}
+      {isVideo && (
+        <button
+          onClick={() => setMuted((m) => !m)}
+          aria-label={muted ? "Ativar som" : "Silenciar"}
+          className="absolute bottom-10 right-3 z-10 bg-black/50 text-white rounded-full p-2 cursor-pointer"
+        >
+          {muted ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16.5 12A4.5 4.5 0 0 0 14 7.97V10l2.45 2.45c.03-.15.05-.3.05-.45zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 18L19 19.27 20.27 18 5.27 3 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+            </svg>
+          )}
+        </button>
       )}
 
       {/* Counter pill — shows video icon for video slides */}

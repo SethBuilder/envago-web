@@ -77,7 +77,8 @@ export default async function ActivityPage({
     ...(activity.videos ?? []).map((v) => ({
       type: "video" as const,
       url: normalizeUrl(v.url),
-      poster_url: v.poster_url,
+      poster_url: v.poster_url ? normalizeUrl(v.poster_url) : null,
+      instagram_handle: v.instagram_handle ?? null,
     })),
   ];
 
