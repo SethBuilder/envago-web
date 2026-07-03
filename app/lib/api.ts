@@ -52,6 +52,7 @@ export interface ApiSchedule {
 export interface ApiVideo {
   url: string;
   poster_url: string | null;
+  instagram_handle: string | null;
 }
 
 export interface ApiActivityDetail extends ApiActivity {
