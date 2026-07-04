@@ -188,7 +188,7 @@ export default function MediaCarousel({
 
       {/* Instagram attribution */}
       {currentItem?.instagram_handle && (
-        <div className="absolute top-10 right-3 z-10 flex items-center gap-1.5 bg-black/40 rounded-full px-2.5 py-1">
+        <div className="absolute top-8 right-2 z-10 flex items-center gap-1.5 bg-black/40 rounded-full px-2.5 py-1">
           <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -208,7 +208,7 @@ export default function MediaCarousel({
         <button
           onClick={() => setMuted((m) => !m)}
           aria-label={muted ? "Ativar som" : "Silenciar"}
-          className="absolute bottom-10 right-3 z-10 bg-black/50 text-white rounded-full p-2 cursor-pointer"
+          className="absolute bottom-8 right-2 z-10 bg-black/50 text-white rounded-full p-2 cursor-pointer"
         >
           {muted ? (
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
