@@ -27,9 +27,37 @@ interface BookingData {
   total_price: string;
   status: string;
   client_secret: string;
+  expires_at: string | null;
   activity: { name: string; slug: string; city: string; pricing_type: string; pricing_unit: string | null };
   date: string;
   time: string;
+}
+
+function useCountdown(expiresAt: string | null) {
+  const getSecondsLeft = () => {
+    if (!expiresAt) return null;
+    return Math.max(0, Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000));
+  };
+  const [secondsLeft, setSecondsLeft] = useState<number | null>(getSecondsLeft);
+
+  useEffect(() => {
+    if (!expiresAt) return;
+    const id = setInterval(() => {
+      const s = getSecondsLeft();
+      setSecondsLeft(s);
+      if (s === 0) clearInterval(id);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [expiresAt]);
+
+  if (secondsLeft === null) return { display: null, expired: false, urgent: false };
+  const m = Math.floor(secondsLeft / 60);
+  const s = secondsLeft % 60;
+  return {
+    display: `${m}:${String(s).padStart(2, "0")}`,
+    expired: secondsLeft === 0,
+    urgent: secondsLeft <= 120,
+  };
 }
 
 // ── PDF generation ────────────────────────────────────────────────────────
@@ -248,10 +276,12 @@ function PaymentForm({
   booking,
   onConfirmed,
   onBack,
+  expired,
 }: {
   booking: BookingData;
   onConfirmed: (b: BookingData) => void;
   onBack: () => void;
+  expired: boolean;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -324,7 +354,13 @@ function PaymentForm({
         </div>
       )}
 
-      {!pixPending && (
+      {expired && (
+        <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 text-center">
+          Sua reserva expirou. Volte e tente novamente.
+        </div>
+      )}
+
+      {!pixPending && !expired && (
         <button
           type="submit"
           disabled={loading || !stripe || !elements}
@@ -363,6 +399,7 @@ export default function CheckoutFlow({
   const [error, setError] = useState<string | null>(null);
   const [booking, setBooking] = useState<BookingData | null>(null);
   const formRef = useRef<HTMLDivElement>(null);
+  const countdown = useCountdown(step === "payment" ? (booking?.expires_at ?? null) : null);
 
   useEffect(() => {
     if (window.innerWidth < 1024) {
@@ -525,7 +562,7 @@ export default function CheckoutFlow({
               <h2 className="text-xl font-bold text-[#111] mb-1">Para onde enviar a confirmação?</h2>
               <p className="text-sm text-[#666] mb-6">Você receberá os detalhes da reserva por e-mail</p>
 
-              <form onSubmit={submitContact} className="flex flex-col gap-4">
+              <form onSubmit={submitContact} autoComplete="on" className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
                   <label htmlFor="guest_name" className="text-sm font-semibold text-[#111]">Nome completo</label>
                   <input id="guest_name" name="name" type="text" value={guestName}
@@ -551,7 +588,7 @@ export default function CheckoutFlow({
                   <input id="guest_whatsapp" name="whatsapp" type="tel" value={guestWhatsapp}
                     onChange={(e) => setGuestWhatsapp(e.target.value)}
                     placeholder="(88) 99999-9999"
-                    autoComplete="tel"
+                    autoComplete="off"
                     className="border-2 border-[#E5E1DC] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#ff2924] transition-colors placeholder:text-[#bbb]" />
                   <p className="text-[11px] text-[#aaa]">O operador pode entrar em contato antes do passeio</p>
                 </div>
@@ -573,15 +610,52 @@ export default function CheckoutFlow({
 
           {/* Payment */}
           {step === "payment" && booking && elementsOptions && (
-            <div className="bg-white rounded-2xl border border-[#E5E1DC] p-6">
-              <Elements stripe={stripePromise} options={elementsOptions}>
-                <PaymentForm
-                  booking={booking}
-                  onConfirmed={(b) => { setBooking(b); setStep("confirmed"); }}
-                  onBack={() => setStep("contact")}
-                />
-              </Elements>
-            </div>
+            <>
+              <div className={`rounded-xl border px-5 py-3.5 transition-colors ${
+                !countdown.display
+                  ? "invisible"
+                  : countdown.expired
+                  ? "bg-red-100 border-red-300"
+                  : countdown.urgent
+                  ? "bg-[#fff0f0] border-[#ff2924] animate-[pulse_0.8s_ease-in-out_infinite]"
+                  : "bg-[#fff0f0] border-[#ff2924]"
+              }`}>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2.5">
+                    <svg className="w-5 h-5 shrink-0 text-[#ff2924]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                    </svg>
+                    <div>
+                      <p className="text-sm font-bold text-[#cc1f1b]">
+                        {countdown.expired
+                          ? "Reserva expirada"
+                          : `${booking?.seats === 1 ? "1 vaga reservada" : `${booking?.seats} vagas reservadas`} para você`}
+                      </p>
+                      {!countdown.expired && (
+                        <p className="text-xs mt-0.5 text-[#ff2924]">
+                          Complete o pagamento antes do tempo acabar
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {!countdown.expired && (
+                    <span className="text-2xl font-bold tabular-nums shrink-0 text-[#ff2924]">
+                      {countdown.display ?? "15:00"}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl border border-[#E5E1DC] p-6">
+                <Elements stripe={stripePromise} options={elementsOptions}>
+                  <PaymentForm
+                    booking={booking}
+                    onConfirmed={(b) => { setBooking(b); setStep("confirmed"); }}
+                    onBack={() => setStep("contact")}
+                    expired={countdown.expired}
+                  />
+                </Elements>
+              </div>
+            </>
           )}
         </div>
 

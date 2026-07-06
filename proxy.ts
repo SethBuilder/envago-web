@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 const ADMIN_COOKIE = "envago_admin";
 const COOKIE_MAX_AGE = 60 * 60; // 1 hour
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const comingSoon = process.env.NEXT_PUBLIC_COMING_SOON === "true";
   if (!comingSoon) return NextResponse.next();
 
