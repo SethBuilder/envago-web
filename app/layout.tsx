@@ -69,6 +69,9 @@ export default function RootLayout({
             gtag('config', 'AW-18282842253');
           `}
         </Script>
+        <Script id="travelpayouts" strategy="afterInteractive">
+          {`(function(){var s=document.createElement("script");s.async=1;s.src='https://emrldtp.com/NTQ3NjEy.js?t=547612';document.head.appendChild(s);})();`}
+        </Script>
       </head>
       <body
         className={`${raleway.variable} font-sans antialiased bg-[#F7F5F2] text-[#111111]`}
