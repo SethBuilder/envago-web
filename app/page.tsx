@@ -85,7 +85,7 @@ export default async function Home({
 
       <footer className="border-t border-[#E5E1DC] bg-white mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#999]">
-          <span>© 2026 Envago. Todos os direitos reservados.</span>
+          <span>© 2026 Elmughrabi LIMITED · Envago. Todos os direitos reservados.</span>
           <div className="flex gap-6">
             <a href="/privacidade" className="hover:text-[#111] transition-colors">Privacidade</a>
             <a href="/termos" className="hover:text-[#111] transition-colors">Termos de uso</a>
