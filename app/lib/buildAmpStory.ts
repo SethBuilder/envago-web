@@ -114,7 +114,7 @@ export function buildAmpStory(data: ApiStoryDetail, slug: string, siteOrigin: st
   <noscript><style amp-boilerplate>${AMP_BOILERPLATE_NOSCRIPT}</style></noscript>
   <style amp-custom>
     amp-story{font-family:'Raleway',sans-serif}
-    .overlay{width:100%;height:100%;background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,transparent 30%),linear-gradient(to top,rgba(0,0,0,.78) 0%,transparent 52%)}
+    .overlay{width:100%;height:100%;background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,transparent 45%),linear-gradient(to top,rgba(0,0,0,.78) 0%,transparent 52%)}
     .txt{padding:0 24px 32px;justify-content:flex-end}
     .dest{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#ff2924;margin:0 0 8px}
     .ttl{font-size:28px;font-weight:700;color:#fff;line-height:1.2;margin:0 0 12px;text-shadow:0 2px 8px rgba(0,0,0,.4)}
