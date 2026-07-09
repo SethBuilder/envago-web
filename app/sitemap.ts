@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { fetchActivities } from "./lib/api";
+import { fetchActivities, fetchArticles, fetchStories } from "./lib/api";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = "https://envago.live";
@@ -32,7 +32,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-    return [...static_pages, ...activityUrls, ...providerUrls];
+    // Articles + Web Stories
+    const [articlesRes, storiesRes] = await Promise.all([fetchArticles(), fetchStories()]);
+    const articleUrls: MetadataRoute.Sitemap = articlesRes.data.map((a) => ({
+      url: `${base}/guias/${a.slug}`,
+      lastModified: a.published_at ? new Date(a.published_at) : new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    }));
+
+    const storyUrls: MetadataRoute.Sitemap = storiesRes.data.map((s) => ({
+      url: `${base}/story/${s.article_slug}`,
+      lastModified: s.published_at ? new Date(s.published_at) : new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    }));
+
+    return [...static_pages, ...activityUrls, ...providerUrls, ...articleUrls, ...storyUrls];
   } catch {
     return static_pages;
   }

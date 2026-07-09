@@ -35,6 +35,8 @@ export interface ApiActivity {
   cover_url: string | null;
   first_video: { url: string; poster_url: string | null } | null;
   provider: { id: number; business_name: string; slug: string; logo_url: string | null; booking_enabled: boolean } | null;
+  booking_method: 'envago' | 'affiliate' | 'lead';
+  link_url: string | null;
   avg_rating: number | null;
   review_count: number;
   recent_reviews: ApiReview[];
@@ -122,5 +124,79 @@ export async function fetchActivity(slug: string, fresh = false): Promise<{ data
     cache: fresh ? "no-store" : undefined,
   });
   if (!res.ok) throw new Error("Activity not found");
+  return res.json();
+}
+
+export interface ApiArticle {
+  id: number;
+  slug: string;
+  title: string;
+  meta_title: string | null;
+  meta_description: string | null;
+  destination: string | null;
+  template_type: string | null;
+  content: string;
+  cover_image: string | null;
+  published_at: string;
+  story?: ApiWebStory | null;
+}
+
+export interface ApiWebStory {
+  id: number;
+  article_id: number;
+  slides: ApiStorySlide[];
+  status: string;
+}
+
+export interface ApiStorySlide {
+  title: string;
+  body: string;
+  image_url: string;
+  cta_text?: string;
+  cta_url?: string;
+}
+
+export async function fetchArticles(): Promise<{ data: ApiArticle[] }> {
+  const res = await fetch(`${API_URL}/api/v1/articles`, { next: { revalidate: 300 } });
+  if (!res.ok) return { data: [] };
+  return res.json();
+}
+
+export async function fetchArticle(slug: string): Promise<{ data: ApiArticle }> {
+  const res = await fetch(`${API_URL}/api/v1/articles/${slug}`, { next: { revalidate: 300 } });
+  if (!res.ok) throw new Error("Article not found");
+  return res.json();
+}
+
+export interface ApiStoryListItem {
+  article_slug: string;
+  article_title: string;
+  article_destination: string | null;
+  poster_image: string;
+  slide_count: number;
+  published_at: string;
+}
+
+export interface ApiStoryDetail {
+  slides: ApiStorySlide[];
+  poster_image: string;
+  published_at: string;
+  article: {
+    slug: string;
+    title: string;
+    destination: string | null;
+    published: boolean;
+  };
+}
+
+export async function fetchStories(): Promise<{ data: ApiStoryListItem[] }> {
+  const res = await fetch(`${API_URL}/api/v1/stories`, { cache: "no-store" });
+  if (!res.ok) return { data: [] };
+  return res.json();
+}
+
+export async function fetchStory(slug: string): Promise<{ data: ApiStoryDetail }> {
+  const res = await fetch(`${API_URL}/api/v1/stories/${slug}`, { next: { revalidate: 60 } });
+  if (!res.ok) throw new Error("Story not found");
   return res.json();
 }

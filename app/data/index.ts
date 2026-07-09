@@ -23,6 +23,7 @@ export interface Category {
 
 export const categories: Category[] = [
   { label: "Todos",                slug: "todos",              icon: "" },
+  { label: "Guias",                slug: "guias",              icon: "/icons/categories/guias.svg" },
   // Core Brazil beach
   { label: "Buggy",                slug: "buggy",              icon: "/icons/categories/buggy.svg" },
   { label: "Surfe",                slug: "surfe",              icon: "/icons/categories/surfing.svg" },

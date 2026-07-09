@@ -1,7 +1,7 @@
 import Navbar from "./components/Navbar";
 import Feed from "./components/Feed";
 import LaraButton from "./components/LaraButton";
-import { fetchActivities, fetchCategories } from "./lib/api";
+import { fetchActivities, fetchArticles, fetchCategories, fetchStories } from "./lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -13,10 +13,18 @@ export default async function Home({
   const { categoria } = await searchParams;
   const initialCategory = typeof categoria === "string" ? categoria : "todos";
 
-  const [{ data: initialActivities, meta }, apiCategories] = await Promise.all([
-    fetchActivities({ category: initialCategory }),
+  const isGuias = initialCategory === "guias";
+
+  const [activitiesResult, apiCategories, articlesResult, storiesResult] = await Promise.all([
+    isGuias ? Promise.resolve({ data: [], meta: { current_page: 1, last_page: 1, total: 0 } }) : fetchActivities({ category: initialCategory }),
     fetchCategories(),
+    isGuias ? fetchArticles() : Promise.resolve({ data: [] }),
+    isGuias ? fetchStories() : Promise.resolve({ data: [] }),
   ]);
+
+  const { data: initialActivities, meta } = activitiesResult;
+  const { data: initialArticles } = articlesResult;
+  const { data: initialStories } = storiesResult;
 
   return (
     <>
@@ -49,7 +57,7 @@ export default async function Home({
           </p>
         </div>
 
-        <Feed initialActivities={initialActivities} initialMeta={meta} apiCategories={apiCategories} initialCategory={initialCategory} />
+        <Feed initialActivities={initialActivities} initialMeta={meta} apiCategories={apiCategories} initialCategory={initialCategory} initialArticles={initialArticles} initialStories={initialStories} />
 
         <section id="como-funciona" className="mt-20 max-w-7xl mx-auto px-4 sm:px-6">
           <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#E5E1DC]">

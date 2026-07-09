@@ -302,6 +302,9 @@ export default async function ActivityPage({
               unitCapacity={activity.unit_capacity}
               schedules={activity.schedules}
               activitySlug={activity.slug}
+              activityId={activity.id}
+              bookingMethod={activity.booking_method}
+              linkUrl={activity.link_url}
               stripeReady={activity.provider?.booking_enabled ?? false}
             />
           </div>
@@ -335,6 +338,9 @@ export default async function ActivityPage({
             unitCapacity={activity.unit_capacity}
             schedules={activity.schedules}
             activitySlug={activity.slug}
+            activityId={activity.id}
+            bookingMethod={activity.booking_method}
+            linkUrl={activity.link_url}
             stripeReady={activity.provider?.booking_enabled ?? false}
           />
         </div>
