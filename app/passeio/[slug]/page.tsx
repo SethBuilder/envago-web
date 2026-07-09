@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import Script from "next/script";
+import ReactMarkdown from "react-markdown";
 import { fetchActivity } from "../../lib/api";
 
 export const dynamic = "force-dynamic";
@@ -208,11 +209,62 @@ export default async function ActivityPage({
               ))}
             </div>
 
+            {/* Highlights */}
+            {activity.highlights && activity.highlights.length > 0 && (
+              <div className="border border-[#E5E1DC] rounded-2xl p-6">
+                <h2 className="text-base font-bold text-[#111] mb-4 flex items-center gap-2">
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#fff0f0]">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2.5 6l2.5 2.5 4.5-5" stroke="#ff2924" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  Destaques
+                </h2>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {activity.highlights.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#fff0f0] flex items-center justify-center mt-0.5">
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                          <path d="M2 5.5l2 2 4-4" stroke="#ff2924" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </span>
+                      <span className="text-sm text-[#222] leading-snug">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Description */}
             {activity.description && (
               <div>
-                <h2 className="text-lg font-bold text-[#111] mb-3">Sobre este passeio</h2>
-                <p className="text-[#555] leading-relaxed">{activity.description}</p>
+                <h2 className="text-base font-bold text-[#111] mb-3 pb-3 border-b border-[#F0EDE8]">
+                  Sobre este passeio
+                </h2>
+                <div className="trip-desc text-[15px] text-[#333] leading-relaxed">
+                  <ReactMarkdown
+                    components={{
+                      h2: ({ children }) => <h3 className="text-base font-bold text-[#111] mt-5 mb-2">{children}</h3>,
+                      h3: ({ children }) => <h4 className="text-sm font-bold text-[#111] mt-4 mb-1.5">{children}</h4>,
+                      p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
+                      ul: ({ children }) => <ul className="mb-3 space-y-1.5 pl-0 list-none">{children}</ul>,
+                      ol: ({ children }) => <ol className="mb-3 space-y-1.5 pl-4 list-decimal">{children}</ol>,
+                      li: ({ children }) => (
+                        <li className="flex items-start gap-2">
+                          <span className="flex-shrink-0 w-4 h-4 rounded-full bg-[#fff0f0] flex items-center justify-center mt-0.5">
+                            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                              <path d="M1.5 4l1.5 1.5 3.5-3" stroke="#ff2924" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </span>
+                          <span>{children}</span>
+                        </li>
+                      ),
+                      strong: ({ children }) => <strong className="font-semibold text-[#111]">{children}</strong>,
+                    }}
+                  >
+                    {activity.description}
+                  </ReactMarkdown>
+                </div>
               </div>
             )}
 

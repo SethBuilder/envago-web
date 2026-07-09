@@ -59,6 +59,7 @@ export interface ApiVideo {
 
 export interface ApiActivityDetail extends ApiActivity {
   description: string | null;
+  highlights: string[];
   capacity: number;
   gallery: string[];
   videos: ApiVideo[];

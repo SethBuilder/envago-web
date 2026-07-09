@@ -107,6 +107,12 @@ export function buildAmpStory(data: ApiStoryDetail, slug: string, siteOrigin: st
   <title>${esc(article.title)}</title>
   <link rel="canonical" href="${storyUrl}">
   <link rel="icon" href="${LOGO_URL}" type="image/png">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="${storyUrl}">
+  <meta property="og:title" content="${esc(article.title)}">
+  <meta property="og:image" content="${esc(poster_image)}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="${esc(poster_image)}">
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600;700&display=swap" rel="stylesheet">
   <script async src="https://cdn.ampproject.org/v0.js"></script>
   <script async custom-element="amp-story" src="https://cdn.ampproject.org/v0/amp-story-1.0.js"></script>
