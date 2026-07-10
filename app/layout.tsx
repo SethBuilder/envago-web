@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import Script from "next/script";
+import Footer from "./components/Footer";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -75,8 +76,10 @@ export default function RootLayout({
       </head>
       <body
         className={`${raleway.variable} font-sans antialiased bg-[#F7F5F2] text-[#111111]`}
+        style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        {children}
+        <div style={{ flex: 1 }}>{children}</div>
+        <Footer />
       </body>
     </html>
   );

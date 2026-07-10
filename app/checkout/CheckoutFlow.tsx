@@ -603,7 +603,7 @@ export default function CheckoutFlow({
 
               <p className="text-[11px] text-[#bbb] text-center mt-4">
                 Ao continuar você concorda com nossa{" "}
-                <a href="/privacy" target="_blank" className="underline hover:text-[#111] transition-colors">Política de privacidade</a>.
+                <a href="/privacidade" target="_blank" className="underline hover:text-[#111] transition-colors">Política de privacidade</a>.
               </p>
             </div>
           )}
