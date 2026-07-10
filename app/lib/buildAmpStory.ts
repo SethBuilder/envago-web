@@ -20,6 +20,10 @@ function esc(str: string | null | undefined): string {
 export function buildAmpStory(data: ApiStoryDetail, slug: string, siteOrigin: string = PROD_ORIGIN): string {
   const { slides, poster_image, published_at, article } = data;
   const storyUrl = `${siteOrigin}/story/${slug}`;
+  const ogImage = poster_image || slides[0]?.image_url || "";
+  const ogDescription = slides[0]?.body
+    ? slides[0].body.slice(0, 155)
+    : `${article.title}${article.destination ? ` em ${article.destination}` : ""}. Descubra com a Envago.`;
 
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
@@ -110,9 +114,13 @@ export function buildAmpStory(data: ApiStoryDetail, slug: string, siteOrigin: st
   <meta property="og:type" content="article">
   <meta property="og:url" content="${storyUrl}">
   <meta property="og:title" content="${esc(article.title)}">
-  <meta property="og:image" content="${esc(poster_image)}">
+  <meta property="og:description" content="${esc(ogDescription)}">
+  <meta property="og:image" content="${esc(ogImage)}">
+  <meta property="og:site_name" content="Envago">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="${esc(poster_image)}">
+  <meta name="twitter:title" content="${esc(article.title)}">
+  <meta name="twitter:description" content="${esc(ogDescription)}">
+  <meta name="twitter:image" content="${esc(ogImage)}">
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600;700&display=swap" rel="stylesheet">
   <script async src="https://cdn.ampproject.org/v0.js"></script>
   <script async custom-element="amp-story" src="https://cdn.ampproject.org/v0/amp-story-1.0.js"></script>

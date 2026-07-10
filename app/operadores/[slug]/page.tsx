@@ -60,12 +60,16 @@ export default async function OperadorPage({
   const state   = provider.activities[0]?.state;
   const category = provider.activities[0]?.category?.name;
 
+  const pageUrl = `https://envago.live/operadores/${slug}`;
+  const metaDescription = `Reserve passeios com ${provider.business_name}${city ? ` em ${city}` : ""} no Envago. Pague online, confirme na hora.`;
+
   const localBusinessLd = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": ["LocalBusiness", "TravelAgency"],
     name: provider.business_name,
-    url: `https://envago.live/operadores/${slug}`,
+    url: pageUrl,
     image: provider.logo_url ?? "https://envago.live/design/logo-novo.svg",
+    description: metaDescription,
     ...(city ? {
       address: {
         "@type": "PostalAddress",
@@ -74,12 +78,37 @@ export default async function OperadorPage({
         addressCountry: "BR",
       },
     } : {}),
-    ...(category ? { description: `Operador de ${category} no Envago.` } : {}),
+    ...(provider.activities.length > 0 ? {
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Passeios",
+        itemListElement: provider.activities.map((a) => ({
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "TouristTrip",
+            name: a.name,
+            url: `https://envago.live/passeio/${a.slug}`,
+          },
+          price: Number(a.price).toFixed(2),
+          priceCurrency: "BRL",
+        })),
+      },
+    } : {}),
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Início", item: "https://envago.live" },
+      { "@type": "ListItem", position: 2, name: provider.business_name, item: pageUrl },
+    ],
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <Navbar />
       {!provider.is_approved && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-3">
