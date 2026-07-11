@@ -34,11 +34,17 @@ export default function Feed({
   const [stories, setStories] = useState<ApiStoryListItem[]>(initialStories);
   const [isPending, startTransition] = useTransition();
 
-  // Always show Guias chip; only show tour categories that have active trips
-  const activeSlugs = new Set(apiCategories.map((c) => c.slug));
-  const visibleCategories = categories.filter(
-    (c) => c.slug === "todos" || c.slug === "guias" || activeSlugs.has(c.slug)
-  );
+  // Drive from API (only categories with active trips), look up icons from hardcoded list
+  const iconMap = new Map(categories.map((c) => [c.slug, c.icon]));
+  const visibleCategories = [
+    { slug: "todos", label: "Todos", icon: "" },
+    { slug: "guias", label: "Guias", icon: "/icons/categories/guias.svg" },
+    ...apiCategories.map((c) => ({
+      slug:  c.slug,
+      label: c.name,
+      icon:  iconMap.get(c.slug) ?? "",
+    })),
+  ];
 
   function changeCategory(slug: string) {
     setActive(slug);
