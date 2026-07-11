@@ -188,7 +188,7 @@ export default function MediaCarousel({
 
       {/* Instagram attribution */}
       {currentItem?.instagram_handle && (
-        <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5">
+        <div className="absolute top-9 left-4 z-10 flex items-center gap-1.5">
           <div style={{
             width: 22, height: 22, borderRadius: 7, flexShrink: 0,
             background: "linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)",
