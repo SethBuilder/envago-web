@@ -63,6 +63,7 @@ export interface ApiActivityDetail extends ApiActivity {
   capacity: number;
   gallery: string[];
   videos: ApiVideo[];
+  media: { type: string; url: string; poster_url: string | null; instagram_handle: string | null }[];
   meeting_point: string | null;
   meeting_point_lat: number | null;
   meeting_point_lng: number | null;
