@@ -24,6 +24,7 @@ export default function MediaCarousel({
   const [paused, setPaused] = useState(false);
   const [muted, setMuted] = useState(true);
   const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
   const barKeyRef = useRef(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -64,13 +65,21 @@ export default function MediaCarousel({
 
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
   }
 
   function handleTouchEnd(e: React.TouchEvent) {
-    if (touchStartX.current === null) return;
+    if (touchStartX.current === null || touchStartY.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
-    if (Math.abs(dx) > 40) dx < 0 ? next() : prev();
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? next() : prev();
     touchStartX.current = null;
+    touchStartY.current = null;
+  }
+
+  function handleTouchCancel() {
+    touchStartX.current = null;
+    touchStartY.current = null;
   }
 
   if (n === 0) {
@@ -84,6 +93,7 @@ export default function MediaCarousel({
       onMouseLeave={() => setPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
     >
       {/* Slides */}
       {items.map((item, i) => (

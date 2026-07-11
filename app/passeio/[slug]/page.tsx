@@ -70,18 +70,25 @@ export default async function ActivityPage({
       : url;
   }
 
-  // Build unified media array: photos first (cover + gallery), then videos
-  const mediaItems = [
-    ...[activity.cover_url, ...activity.gallery]
-      .filter((url): url is string => Boolean(url))
-      .map((url) => ({ type: "photo" as const, url: normalizeUrl(url), poster_url: null })),
-    ...(activity.videos ?? []).map((v) => ({
-      type: "video" as const,
-      url: normalizeUrl(v.url),
-      poster_url: v.poster_url ? normalizeUrl(v.poster_url) : null,
-      instagram_handle: v.instagram_handle ?? null,
-    })),
-  ];
+  // Use ordered media array from API; fall back to legacy cover/gallery/videos if absent
+  const mediaItems = activity.media?.length
+    ? activity.media.map((m: { type: string; url: string; poster_url: string | null; instagram_handle?: string | null }) => ({
+        type: m.type as "photo" | "video",
+        url: normalizeUrl(m.url),
+        poster_url: m.poster_url ? normalizeUrl(m.poster_url) : null,
+        instagram_handle: m.instagram_handle ?? null,
+      }))
+    : [
+        ...[activity.cover_url, ...activity.gallery]
+          .filter((url): url is string => Boolean(url))
+          .map((url) => ({ type: "photo" as const, url: normalizeUrl(url), poster_url: null, instagram_handle: null })),
+        ...(activity.videos ?? []).map((v: { url: string; poster_url: string | null; instagram_handle?: string | null }) => ({
+          type: "video" as const,
+          url: normalizeUrl(v.url),
+          poster_url: v.poster_url ? normalizeUrl(v.poster_url) : null,
+          instagram_handle: v.instagram_handle ?? null,
+        })),
+      ];
 
 
   const mapsUrl = activity.meeting_point_lat && activity.meeting_point_lng
