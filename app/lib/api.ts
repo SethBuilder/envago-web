@@ -57,6 +57,14 @@ export interface ApiVideo {
   instagram_handle: string | null;
 }
 
+export interface ApiActivityQuestion {
+  id: number;
+  label: string;
+  type: 'text' | 'select';
+  options: string[];
+  required: boolean;
+}
+
 export interface ApiActivityDetail extends ApiActivity {
   description: string | null;
   highlights: string[];
@@ -75,6 +83,7 @@ export interface ApiActivityDetail extends ApiActivity {
     created_at: string;
   }[];
   schedules: ApiSchedule[];
+  questions: ApiActivityQuestion[];
 }
 
 export interface ActivitiesResponse {

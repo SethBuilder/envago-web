@@ -8,7 +8,7 @@ import Link from "next/link";
 
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import type { ApiActivityDetail, ApiSchedule } from "../lib/api";
+import type { ApiActivityDetail, ApiActivityQuestion, ApiSchedule } from "../lib/api";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 const API_URL = "";
@@ -391,7 +391,11 @@ export default function CheckoutFlow({
   const priceNum = Number(activity.price);
   const total = priceNum * seats;
 
-  const [step, setStep] = useState<"contact" | "payment" | "confirmed">("contact");
+  const questions = activity.questions ?? [];
+  const hasQuestions = questions.length > 0;
+
+  const [step, setStep] = useState<"questions" | "contact" | "payment" | "confirmed">(hasQuestions ? "questions" : "contact");
+  const [answers, setAnswers] = useState<Record<number, string>>({});
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [guestWhatsapp, setGuestWhatsapp] = useState("");
@@ -440,10 +444,14 @@ export default function CheckoutFlow({
     setLoading(true);
     setError(null);
     try {
+      const customerAnswers = questions.length > 0
+        ? questions.map(q => ({ question_id: q.id, label: q.label, answer: answers[q.id] ?? "" })).filter(a => a.answer)
+        : undefined;
+
       const res = await fetch(`${API_URL}/api/v1/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ schedule_id: schedule.id, seats, guest_name: guestName, guest_email: guestEmail, guest_whatsapp: guestWhatsapp || undefined }),
+        body: JSON.stringify({ schedule_id: schedule.id, seats, guest_name: guestName, guest_email: guestEmail, guest_whatsapp: guestWhatsapp || undefined, customer_answers: customerAnswers }),
       });
       const json = await res.json();
       if (!res.ok) { setError(json.message ?? "Algo deu errado."); return; }
@@ -541,20 +549,76 @@ export default function CheckoutFlow({
         <div ref={formRef} className="flex flex-col gap-6 order-2 lg:order-1">
           {/* Step indicator */}
           <div className="flex items-center gap-3 text-sm">
-            <div className={`flex items-center gap-2 font-semibold ${step === "contact" ? "text-[#111]" : "text-green-700"}`}>
-              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === "contact" ? "bg-[#ff2924] text-white" : "bg-green-500 text-white"}`}>
-                {step === "contact" ? "1" : "✓"}
+            {hasQuestions && (
+              <>
+                <div className={`flex items-center gap-2 font-semibold ${step === "questions" ? "text-[#111]" : "text-green-700"}`}>
+                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === "questions" ? "bg-[#ff2924] text-white" : "bg-green-500 text-white"}`}>
+                    {step === "questions" ? "1" : "✓"}
+                  </span>
+                  Informações
+                </div>
+                <span className="text-[#bbb] font-bold tracking-widest">——</span>
+              </>
+            )}
+            <div className={`flex items-center gap-2 font-semibold ${step === "contact" ? "text-[#111]" : step === "questions" ? "text-[#777]" : "text-green-700"}`}>
+              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === "contact" ? "bg-[#ff2924] text-white" : step === "questions" ? "bg-[#999] text-white" : "bg-green-500 text-white"}`}>
+                {step !== "questions" && step !== "contact" ? "✓" : hasQuestions ? "2" : "1"}
               </span>
               Seus dados
             </div>
             <span className="text-[#bbb] font-bold tracking-widest">——</span>
             <div className={`flex items-center gap-2 font-semibold ${step === "payment" ? "text-[#111]" : "text-[#777]"}`}>
               <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === "payment" ? "bg-[#ff2924] text-white" : "bg-[#999] text-white"}`}>
-                2
+                {hasQuestions ? "3" : "2"}
               </span>
               Pagamento
             </div>
           </div>
+
+          {/* Questions step */}
+          {step === "questions" && (
+            <div className="bg-white rounded-2xl border border-[#E5E1DC] p-6">
+              <h2 className="text-xl font-bold text-[#111] mb-1">Informações do passeio</h2>
+              <p className="text-sm text-[#666] mb-6">O operador precisa dessas informações para organizar o seu passeio</p>
+
+              <form onSubmit={(e) => { e.preventDefault(); setStep("contact"); }} className="flex flex-col gap-4">
+                {questions.map((q: ApiActivityQuestion) => (
+                  <div key={q.id} className="flex flex-col gap-1">
+                    <label className="text-sm font-semibold text-[#111]">
+                      {q.label}
+                      {!q.required && <span className="text-[#999] font-normal ml-1">(opcional)</span>}
+                    </label>
+                    {q.type === "select" ? (
+                      <select
+                        value={answers[q.id] ?? ""}
+                        onChange={(e) => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
+                        required={q.required}
+                        className="border-2 border-[#E5E1DC] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#ff2924] transition-colors bg-white"
+                      >
+                        <option value="">Selecionar…</option>
+                        {q.options.map((opt: string) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        value={answers[q.id] ?? ""}
+                        onChange={(e) => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
+                        required={q.required}
+                        className="border-2 border-[#E5E1DC] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#ff2924] transition-colors placeholder:text-[#bbb]"
+                      />
+                    )}
+                  </div>
+                ))}
+
+                <button type="submit"
+                  className="w-full bg-[#ff2924] text-white font-bold py-4 rounded-xl hover:bg-[#d41f1b] transition-colors cursor-pointer text-base mt-1">
+                  Continuar →
+                </button>
+              </form>
+            </div>
+          )}
 
           {/* Contact form */}
           {step === "contact" && (
@@ -600,6 +664,13 @@ export default function CheckoutFlow({
                   {loading ? "Aguarde…" : "Continuar para pagamento →"}
                 </button>
               </form>
+
+              {hasQuestions && (
+                <button type="button" onClick={() => setStep("questions")}
+                  className="text-sm text-[#999] hover:text-[#111] text-center transition-colors cursor-pointer mt-1">
+                  ← Voltar
+                </button>
+              )}
 
               <p className="text-[11px] text-[#bbb] text-center mt-4">
                 Ao continuar você concorda com nossa{" "}
