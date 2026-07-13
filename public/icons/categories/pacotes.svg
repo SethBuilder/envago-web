@@ -13,26 +13,26 @@
         <g transform="translate(3.000000, 11.000000)" fill-rule="nonzero">
             <g>
                 <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"/>
-                <use fill="#C4783A" fill-rule="evenodd" xlink:href="#path-1"/>
+                <use fill="#288B9C" fill-rule="evenodd" xlink:href="#path-1"/>
             </g>
             <path d="M98.5578186,197 C123.089315,197 150.320063,187.666909 168.33315,170.371076 C182.911985,156.372748 190.723175,136.817669 191.922362,115.455924 C193.820399,67.8130427 160.733624,-4.14248827 112.803186,0.18662102 C64.8727472,4.51573031 0,38.8638233 0,98.5933105 C3.56454946e-15,158.322798 54.1718335,197 98.5578186,197 Z" stroke="#FFFFFF" stroke-width="1.5"/>
         </g>
         <!-- Handle outer (white) -->
         <rect x="76" y="76" width="52" height="24" rx="9" fill="#FFFFFF"/>
         <!-- Handle inner cutout (background colour) -->
-        <rect x="87" y="83" width="30" height="16" rx="6" fill="#C4783A"/>
+        <rect x="87" y="83" width="30" height="16" rx="6" fill="#288B9C"/>
         <!-- Suitcase body (white) -->
         <rect x="43" y="95" width="118" height="95" rx="12" fill="#FFFFFF"/>
         <!-- Left reinforcement rib -->
-        <rect x="67" y="95" width="8" height="95" rx="0" fill="#C4783A"/>
+        <rect x="67" y="95" width="8" height="95" rx="0" fill="#288B9C"/>
         <!-- Right reinforcement rib -->
-        <rect x="129" y="95" width="8" height="95" rx="0" fill="#C4783A"/>
+        <rect x="129" y="95" width="8" height="95" rx="0" fill="#288B9C"/>
         <!-- Horizontal zipper divider -->
-        <rect x="43" y="138" width="118" height="8" fill="#C4783A"/>
+        <rect x="43" y="138" width="118" height="8" fill="#288B9C"/>
         <!-- Clasp outer (white) -->
         <circle cx="102" cy="142" r="13" fill="#FFFFFF"/>
         <!-- Clasp inner (background colour) -->
-        <circle cx="102" cy="142" r="8" fill="#C4783A"/>
+        <circle cx="102" cy="142" r="8" fill="#288B9C"/>
         <!-- Clasp keyhole dot -->
         <circle cx="102" cy="142" r="3.5" fill="#FFFFFF"/>
     </g>
