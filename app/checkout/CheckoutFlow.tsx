@@ -391,6 +391,7 @@ export default function CheckoutFlow({
 }) {
   const priceNum = Number(activity.price);
   const total = priceNum * seats;
+  const isLead = activity.booking_method === 'lead';
 
   const questions = activity.questions ?? [];
   const hasQuestions = questions.length > 0;
@@ -440,7 +441,7 @@ export default function CheckoutFlow({
       }
     : undefined;
 
-  async function submitContact(e: React.FormEvent) {
+  async function proceedToPayment(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -463,6 +464,23 @@ export default function CheckoutFlow({
     } finally {
       setLoading(false);
     }
+  }
+
+  async function proceedToWhatsApp(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await fetch(`${API_URL}/api/v1/clicks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ activity_id: activity.id, name: guestName.trim(), email: guestEmail.trim() || undefined, whatsapp: guestWhatsapp.trim() || undefined }),
+      });
+    } catch {}
+    const date = new Date(schedule.date + "T00:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "long" });
+    const msg = `Vim pelo envago.live/passeio/${activity.slug}\n\nPasseio: ${activity.name}\nData: ${date}\nHorário: ${schedule.time}\nPessoas: ${seats}\nNome: ${guestName.trim()}\n`;
+    const waNumber = (activity.link_url ?? "").replace(/\D/g, "");
+    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, "_blank");
+    setLoading(false);
   }
 
   // ── Confirmed ─────────────────────────────────────────────────────────────
@@ -567,13 +585,17 @@ export default function CheckoutFlow({
               </span>
               Seus dados
             </div>
-            <span className="text-[#bbb] font-bold tracking-widest">——</span>
-            <div className={`flex items-center gap-2 font-semibold ${step === "payment" ? "text-[#111]" : "text-[#777]"}`}>
-              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === "payment" ? "bg-[#ff2924] text-white" : "bg-[#999] text-white"}`}>
-                {hasQuestions ? "3" : "2"}
-              </span>
-              Pagamento
-            </div>
+            {!isLead && (
+              <>
+                <span className="text-[#bbb] font-bold tracking-widest">——</span>
+                <div className={`flex items-center gap-2 font-semibold ${step === "payment" ? "text-[#111]" : "text-[#777]"}`}>
+                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === "payment" ? "bg-[#ff2924] text-white" : "bg-[#999] text-white"}`}>
+                    {hasQuestions ? "3" : "2"}
+                  </span>
+                  Pagamento
+                </div>
+              </>
+            )}
           </div>
 
           {/* Questions step */}
@@ -624,10 +646,14 @@ export default function CheckoutFlow({
           {/* Contact form */}
           {step === "contact" && (
             <div className="bg-white rounded-2xl border border-[#E5E1DC] p-6">
-              <h2 className="text-xl font-bold text-[#111] mb-1">Para onde enviar a confirmação?</h2>
-              <p className="text-sm text-[#666] mb-6">Você receberá os detalhes da reserva por e-mail</p>
+              <h2 className="text-xl font-bold text-[#111] mb-1">
+                {isLead ? "Seus dados" : "Para onde enviar a confirmação?"}
+              </h2>
+              <p className="text-sm text-[#666] mb-6">
+                {isLead ? "O operador pode entrar em contato com você antes do passeio" : "Você receberá os detalhes da reserva por e-mail"}
+              </p>
 
-              <form onSubmit={submitContact} autoComplete="on" className="flex flex-col gap-4">
+              <form onSubmit={isLead ? proceedToWhatsApp : proceedToPayment} autoComplete="on" className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
                   <label htmlFor="guest_name" className="text-sm font-semibold text-[#111]">Nome completo</label>
                   <input id="guest_name" name="name" type="text" value={guestName}
@@ -660,10 +686,22 @@ export default function CheckoutFlow({
 
                 {error && <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">{error}</p>}
 
-                <button type="submit" disabled={loading}
-                  className="w-full bg-[#ff2924] text-white font-bold py-4 rounded-xl hover:bg-[#d41f1b] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-base mt-1">
-                  {loading ? "Aguarde…" : "Continuar para pagamento →"}
-                </button>
+                {isLead ? (
+                  <button type="submit" disabled={loading || !guestName.trim()}
+                    className="w-full flex items-center justify-center gap-2 text-white font-bold py-4 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-base mt-1"
+                    style={{ backgroundColor: loading ? "#1ebe5d" : "#25D366" }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.856L.057 23.428a.5.5 0 00.515.572l5.736-1.505A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.95 9.95 0 01-5.073-1.38l-.364-.217-3.773.99 1.006-3.671-.237-.376A9.957 9.957 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                    </svg>
+                    {loading ? "Abrindo WhatsApp…" : "Confirmar pelo WhatsApp"}
+                  </button>
+                ) : (
+                  <button type="submit" disabled={loading}
+                    className="w-full bg-[#ff2924] text-white font-bold py-4 rounded-xl hover:bg-[#d41f1b] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-base mt-1">
+                    {loading ? "Aguarde…" : "Continuar para pagamento →"}
+                  </button>
+                )}
               </form>
 
               {hasQuestions && (

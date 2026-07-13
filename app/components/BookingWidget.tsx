@@ -69,12 +69,6 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
   const [calOpen,          setCalOpen]          = useState(false);
   const calRef = useRef<HTMLDivElement>(null);
 
-  // Lead capture form state (used by bookingMethod === "lead")
-  const [showLeadForm,  setShowLeadForm]  = useState(false);
-  const [leadName,      setLeadName]      = useState("");
-  const [leadEmail,     setLeadEmail]     = useState("");
-  const [leadWhatsapp,  setLeadWhatsapp]  = useState("");
-  const [leadSubmitting, setLeadSubmitting] = useState(false);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -108,42 +102,6 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
     router.push(`/checkout?activity=${activitySlug}&schedule=${selectedSchedule.id}&seats=${seats}`);
   }
 
-  async function submitLead() {
-    if (!leadName.trim() || !leadWhatsapp.trim()) return;
-    setLeadSubmitting(true);
-    const date = selectedDate
-      ? toLocalDate(selectedDate).toLocaleDateString("pt-BR", { day: "numeric", month: "long" })
-      : "";
-    const time = selectedSchedule?.time ?? "";
-    const pax  = _seats;
-
-    try {
-      await fetch("/api/v1/clicks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          activity_id: activityId,
-          name:        leadName.trim(),
-          email:       leadEmail.trim() || undefined,
-          whatsapp:    leadWhatsapp.trim(),
-        }),
-      });
-    } catch {}
-
-    const msg = [
-      `Olá! Vi este passeio no Envago e gostaria de reservar.`,
-      `Passeio: ${activityName ?? activitySlug.replace(/-/g, " ")}`,
-      date ? `Data: ${date}` : "",
-      time ? `Horário: ${time}` : "",
-      `Pessoas: ${pax}`,
-      `Meu nome: ${leadName.trim()}`,
-    ].filter(Boolean).join("\n");
-
-    const waNumber = (linkUrl ?? "").replace(/\D/g, "");
-    const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
-    window.open(waUrl, "_blank");
-    setLeadSubmitting(false);
-  }
 
   function prevMonth() {
     setCalMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1));
@@ -332,64 +290,21 @@ export default function BookingWidget({ price, pricingType = "per_person", prici
           </span>
           <span className="font-bold text-[#111] text-base">R$ {total.toFixed(0)}</span>
         </div>
-        {!showLeadForm ? (
-          <>
-            <button
-              disabled={maxSeats === 0 && !!selectedSchedule}
-              onClick={() => {
-                if (!selectedSchedule) { setCalOpen(true); return; }
-                if (bookingMethod === "lead") { setShowLeadForm(true); return; }
-                goToCheckout();
-              }}
-              className="w-full bg-[#ff2924] text-white font-bold py-3 rounded-xl hover:bg-[#d41f1b] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
-              Reservar agora
-            </button>
-            {maxSeats === 0 && selectedSchedule ? (
-              <p className="text-center text-xs text-red-500">Este horário está esgotado — escolha outro.</p>
-            ) : bookingMethod === "lead" ? (
-              <p className="text-center text-xs text-[#999]">Confirme pelo WhatsApp do operador</p>
-            ) : (
-              <p className="text-center text-xs text-[#999]">Você não será cobrado agora</p>
-            )}
-          </>
+        <button
+          disabled={maxSeats === 0 && !!selectedSchedule}
+          onClick={() => {
+            if (!selectedSchedule) { setCalOpen(true); return; }
+            goToCheckout();
+          }}
+          className="w-full bg-[#ff2924] text-white font-bold py-3 rounded-xl hover:bg-[#d41f1b] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+          Reservar agora
+        </button>
+        {maxSeats === 0 && selectedSchedule ? (
+          <p className="text-center text-xs text-red-500">Este horário está esgotado — escolha outro.</p>
+        ) : bookingMethod === "lead" ? (
+          <p className="text-center text-xs text-[#999]">Confirme pelo WhatsApp do operador</p>
         ) : (
-          <div className="flex flex-col gap-3">
-            <p className="text-sm font-bold text-[#111]">Seus dados para reserva</p>
-            <input
-              type="text"
-              placeholder="Nome *"
-              value={leadName}
-              onChange={e => setLeadName(e.target.value)}
-              className="w-full border border-[#E5E1DC] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#111]"
-            />
-            <input
-              type="email"
-              placeholder="E-mail"
-              value={leadEmail}
-              onChange={e => setLeadEmail(e.target.value)}
-              className="w-full border border-[#E5E1DC] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#111]"
-            />
-            <input
-              type="tel"
-              placeholder="WhatsApp *"
-              value={leadWhatsapp}
-              onChange={e => setLeadWhatsapp(e.target.value)}
-              className="w-full border border-[#E5E1DC] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#111]"
-            />
-            <button
-              disabled={leadSubmitting || !leadName.trim() || !leadWhatsapp.trim()}
-              onClick={submitLead}
-              className="w-full bg-[#25D366] text-white font-bold py-3 rounded-xl hover:bg-[#1ebe5d] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.856L.057 23.428a.5.5 0 00.515.572l5.736-1.505A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.95 9.95 0 01-5.073-1.38l-.364-.217-3.773.99 1.006-3.671-.237-.376A9.957 9.957 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-              </svg>
-              {leadSubmitting ? "Abrindo WhatsApp..." : "Confirmar pelo WhatsApp"}
-            </button>
-            <button onClick={() => setShowLeadForm(false)} className="text-xs text-[#999] hover:text-[#555] cursor-pointer">
-              ← Voltar
-            </button>
-          </div>
+          <p className="text-center text-xs text-[#999]">Você não será cobrado agora</p>
         )}
       </div>
     </div>

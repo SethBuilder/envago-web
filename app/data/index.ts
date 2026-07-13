@@ -39,6 +39,8 @@ export const categories: Category[] = [
   { label: "Jet Ski",              slug: "jet-ski",            icon: "/icons/categories/jet-ski.svg" },
   { label: "Meditação",            slug: "meditacao",          icon: "/icons/categories/meditation.svg" },
   { label: "Quad",                 slug: "quad",               icon: "/icons/categories/quad.svg" },
+  { label: "Pacotes",              slug: "pacotes",            icon: "/icons/categories/pacotes.svg" },
+  { label: "Pacotes",              slug: "pacote",             icon: "/icons/categories/pacotes.svg" },
   // Extended
   { label: "Rapel",                slug: "abseiling",          icon: "/icons/categories/abseiling.svg" },
   { label: "Balão",                slug: "air-balloon",        icon: "/icons/categories/air-balloon.svg" },
