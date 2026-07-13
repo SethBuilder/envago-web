@@ -288,6 +288,7 @@ function PaymentForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pixPending, setPixPending] = useState(false);
+  const [stripeReady, setStripeReady] = useState(false);
 
   const pollStatus = useCallback(async () => {
     try {
@@ -343,7 +344,7 @@ function PaymentForm({
         <p className="text-sm text-[#666]">Seus dados estão protegidos por criptografia SSL</p>
       </div>
 
-      <PaymentElement options={{ layout: "tabs", paymentMethodOrder: ["card", "pix"] }} />
+      <PaymentElement options={{ layout: "tabs", paymentMethodOrder: ["card", "pix"] }} onReady={() => setStripeReady(true)} />
 
       {error && <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">{error}</p>}
 
@@ -363,7 +364,7 @@ function PaymentForm({
       {!pixPending && !expired && (
         <button
           type="submit"
-          disabled={loading || !stripe || !elements}
+          disabled={loading || !stripe || !elements || !stripeReady}
           className="w-full bg-[#ff2924] text-white font-bold py-4 rounded-xl hover:bg-[#d41f1b] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-base"
         >
           {loading ? "Processando…" : `Pagar R$ ${Number(booking.total_price).toFixed(0)}`}
