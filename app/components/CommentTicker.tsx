@@ -31,6 +31,20 @@ export default function CommentTicker({ reviews }: { reviews: ApiReview[] }) {
 
   if (n === 0) return null;
 
+  if (n === 1) {
+    const r = reviews[0];
+    return (
+      <div className="flex items-center gap-2" style={{ height: ROW }}>
+        <span className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[9px] font-bold ${avatarColors[0]}`}>
+          {r.author_name.charAt(0).toUpperCase()}
+        </span>
+        <p className="text-[11px] text-white/90 leading-none overflow-hidden whitespace-nowrap text-ellipsis">
+          <span className="font-semibold text-white">{r.author_name.split(" ")[0]}</span>{" "}{r.body}
+        </p>
+      </div>
+    );
+  }
+
   const items = [0, 1, 2].map((i) => reviews[(pos + i) % n]);
 
   return (
