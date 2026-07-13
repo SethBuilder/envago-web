@@ -27,33 +27,6 @@ export default function Footer() {
         {/* Social icons */}
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
 
-          {/* Instagram */}
-          <a
-            href="https://www.instagram.com/envagobrasil"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram @envagobrasil"
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 14,
-              background: "linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              transition: "transform 0.15s, opacity 0.15s",
-            }}
-            onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.1)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-          >
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-              <rect x="2" y="2" width="20" height="20" rx="5.5" stroke="white" strokeWidth="1.8"/>
-              <circle cx="12" cy="12" r="4.5" stroke="white" strokeWidth="1.8"/>
-              <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
-            </svg>
-          </a>
-
           {/* Facebook */}
           <a
             href="https://www.facebook.com/envago.io/"

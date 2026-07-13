@@ -1,6 +1,5 @@
 import Navbar from "./components/Navbar";
 import Feed from "./components/Feed";
-import LaraButton from "./components/LaraButton";
 import { fetchActivities, fetchArticles, fetchCategories, fetchStories } from "./lib/api";
 
 export const dynamic = "force-dynamic";
@@ -79,28 +78,8 @@ export default async function Home({
           </div>
         </section>
 
-        <section id="operadores" className="mt-12 max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="bg-[#ff2924] rounded-3xl p-8 sm:p-12 text-white text-center">
-            <h2 className="text-2xl font-bold mb-3">Você é operador de passeios?</h2>
-            <p className="text-white/80 mb-6 max-w-lg mx-auto">
-              Cadastre seu tour gratuitamente. Sem mensalidade, sem taxa de setup.
-              Você paga só quando vende — 10% por reserva gerada pela Envago.
-            </p>
-            <LaraButton />
-          </div>
-        </section>
       </main>
 
-      <footer className="border-t border-[#E5E1DC] bg-white mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#999]">
-          <span>© 2026 Elmughrabi LIMITED · Envago. Todos os direitos reservados.</span>
-          <div className="flex gap-6">
-            <a href="/privacidade" className="hover:text-[#111] transition-colors">Privacidade</a>
-            <a href="/termos" className="hover:text-[#111] transition-colors">Termos de uso</a>
-            <a href="/contato" className="hover:text-[#111] transition-colors">Contato</a>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }
