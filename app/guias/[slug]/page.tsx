@@ -79,15 +79,15 @@ export default async function ArticlePage({
         <h1 className="text-3xl font-bold text-[#111] leading-tight mb-4">
           {article.title}
         </h1>
-        {article.cover_image ? (
-          <img
-            src={article.cover_image}
-            alt={article.title}
-            className="w-full rounded-2xl object-cover max-h-80 mb-8"
-          />
-        ) : (
-          <div className="w-full rounded-2xl mb-8 bg-[#E5E1DC]" style={{ height: 320 }} />
-        )}
+        <div className="w-full rounded-2xl mb-8 overflow-hidden bg-[#E5E1DC]" style={{ aspectRatio: "16/9" }}>
+          {article.cover_image && (
+            <img
+              src={article.cover_image}
+              alt={article.title}
+              className="w-full h-full object-cover"
+            />
+          )}
+        </div>
         <article
           className="max-w-none [&_p]:mb-6 [&_h2]:mt-10 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-[#111] [&_h3]:mt-8 [&_h3]:mb-2 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-[#111]"
           dangerouslySetInnerHTML={{ __html: article.content }}
