@@ -416,7 +416,7 @@ export default function CheckoutFlow({
   useEffect(() => {
     if (step === "confirmed" && booking) {
       window.gtag?.("event", "conversion", {
-        send_to: "AW-18282842253/YUPgCN62k8kcEI2R-I1E",
+        send_to: "AW-18282842253/7dfjCNzUy9AcEI2R-I1E",
         value: Number(booking.total_price),
         currency: "BRL",
         transaction_id: booking.reference,
