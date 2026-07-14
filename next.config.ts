@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      { source: "/:path*", has: [{ type: "host", value: "www.envago.live" }], destination: "https://envago.live/:path*", permanent: true },
       { source: "/parceiros", destination: "https://painel.envago.live/parceiros", permanent: false },
       { source: "/login", destination: "https://painel.envago.live/login", permanent: false },
       { source: "/provider/:path*", destination: "https://painel.envago.live/provider/:path*", permanent: false },
