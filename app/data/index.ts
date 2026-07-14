@@ -41,6 +41,7 @@ export const categories: Category[] = [
   { label: "Quad",                 slug: "quad",               icon: "/icons/categories/quad.svg" },
   { label: "Pacotes",              slug: "pacotes",            icon: "/icons/categories/pacotes.svg" },
   { label: "Pacotes",              slug: "pacote",             icon: "/icons/categories/pacotes.svg" },
+  { label: "Passeio de Lagoas",   slug: "passeio-lagoas",     icon: "/icons/categories/lagoas.svg" },
   // Extended
   { label: "Rapel",                slug: "abseiling",          icon: "/icons/categories/abseiling.svg" },
   { label: "Balão",                slug: "air-balloon",        icon: "/icons/categories/air-balloon.svg" },
