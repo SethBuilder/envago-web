@@ -350,6 +350,24 @@ export default async function ActivityPage({
                 <span style={{color: '#aaa', fontSize: '18px'}}>›</span>
               </Link>
             )}
+
+            {/* Claim banner — only for unclaimed pages */}
+            {activity.provider?.claimed === false && (
+              <div className="border border-[#E5E1DC] rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div className="flex-1">
+                  <p className="text-xs text-[#bbb] uppercase tracking-wide font-semibold mb-1">Este passeio ainda não foi reivindicado</p>
+                  <p className="text-sm text-[#666]">
+                    É o operador deste passeio? Cadastre no Envago de graça e comece a receber reservas online.
+                  </p>
+                </div>
+                <a
+                  href="https://painel.envago.live/parceiros"
+                  className="flex-shrink-0 text-sm font-semibold text-[#555] border border-[#ccc] rounded-xl px-4 py-2 hover:border-[#111] hover:text-[#111] transition-colors whitespace-nowrap"
+                >
+                  Criar minha conta →
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Right: booking widget (desktop) */}
