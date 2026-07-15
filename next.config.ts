@@ -18,7 +18,9 @@ const nextConfig: NextConfig = {
 
       { source: "/parceiros", destination: "https://painel.envago.live/parceiros", permanent: false },
       { source: "/login", destination: "https://painel.envago.live/login", permanent: false },
+      { source: "/provider", destination: "https://painel.envago.live/provider", permanent: false },
       { source: "/provider/:path*", destination: "https://painel.envago.live/provider/:path*", permanent: false },
+      { source: "/admin", destination: "https://painel.envago.live/admin", permanent: false },
       { source: "/admin/:path*", destination: "https://painel.envago.live/admin/:path*", permanent: false },
     ];
   },
