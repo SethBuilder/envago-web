@@ -17,6 +17,7 @@ export interface ApiProvider {
   logo_url: string | null;
   is_approved: boolean;
   booking_enabled: boolean;
+  claimed: boolean;
   activities: ApiActivity[];
 }
 
