@@ -108,9 +108,9 @@ export default function ProviderActivities({
               <Image
                 src={iconFor(singleCategory.slug)}
                 alt={singleCategory.name}
-                width={18}
-                height={18}
-                className="w-4 h-4 object-contain opacity-50"
+                width={48}
+                height={48}
+                className="w-12 h-12 object-contain opacity-70"
               />
             )}
             <p className="text-sm text-[#999]">
