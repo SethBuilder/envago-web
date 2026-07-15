@@ -148,6 +148,8 @@ export default async function OperadorPage({
               {!provider.claimed && (
                 <a
                   href={`https://painel.envago.live/parceiros?claim=${provider.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs text-[#999] border border-[#ddd] rounded-full px-3 py-1 hover:border-[#999] hover:text-[#555] transition-colors whitespace-nowrap"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
