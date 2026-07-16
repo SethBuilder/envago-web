@@ -17,13 +17,6 @@ export default function Navbar() {
         </Link>
 
         <div className="flex-1" />
-
-        <a
-          href="https://painel.envago.live/parceiros"
-          className="flex-shrink-0 text-sm font-semibold bg-[#ff2924] text-white px-4 py-2 rounded-full hover:bg-[#d41f1b] transition-colors"
-        >
-          Listar meu passeio
-        </a>
       </div>
     </header>
   );

@@ -5,7 +5,7 @@ import Script from "next/script";
 import ReactMarkdown from "react-markdown";
 import { fetchActivity } from "../../lib/api";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 import BookingWidget from "../../components/BookingWidget";
 import MediaCarousel from "../../components/MediaCarousel";
 import Navbar from "../../components/Navbar";
@@ -113,7 +113,7 @@ export default async function ActivityPage({
       url: `https://envago.live/passeio/${activity.slug}`,
     },
     provider: activity.provider ? {
-      "@type": "TouristInformationCenter",
+      "@type": "TravelAgency",
       name: activity.provider.business_name,
       url: `https://envago.live/operadores/${activity.provider.slug}`,
     } : undefined,

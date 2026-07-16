@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Envago | Passeios e Aventuras no Brasil",
     description:
-      "Descubra e reserve passeios incríveis em Jericoacoara e em todo o Brasil.",
+      "Reserve os melhores passeios de buggy, kitesurf, barco e trilhas no Brasil. Pague online, confirme na hora.",
     type: "website",
     locale: "pt_BR",
     siteName: "Envago",

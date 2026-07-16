@@ -5,7 +5,7 @@ import Script from "next/script";
 import Navbar from "../../components/Navbar";
 import { fetchArticle } from "../../lib/api";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400;
 
 export async function generateMetadata({
   params,
@@ -57,6 +57,7 @@ export default async function ArticlePage({
     "description": article.meta_description ?? undefined,
     "image": article.cover_image ?? undefined,
     "datePublished": article.published_at,
+    "author": { "@type": "Person", "name": "Seif Elmughrabi" },
     "publisher": {
       "@type": "Organization",
       "name": "Envago",

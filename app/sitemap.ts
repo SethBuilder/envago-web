@@ -21,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const activityUrls: MetadataRoute.Sitemap = activities.map((a) => ({
       url: `${base}/passeio/${a.slug}`,
+      lastModified: a.updated_at ? new Date(a.updated_at) : new Date(),
       changeFrequency: "weekly",
       priority: 0.8,
     }));

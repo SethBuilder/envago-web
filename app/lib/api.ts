@@ -38,6 +38,7 @@ export interface ApiActivity {
   provider: { id: number; business_name: string; slug: string; logo_url: string | null; booking_enabled: boolean } | null;
   booking_method: 'envago' | 'affiliate' | 'lead';
   link_url: string | null;
+  updated_at: string;
   avg_rating: number | null;
   review_count: number;
   recent_reviews: ApiReview[];

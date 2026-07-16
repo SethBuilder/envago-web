@@ -5,7 +5,7 @@ import { fetchProvider } from "../../lib/api";
 import Navbar from "../../components/Navbar";
 import ProviderActivities from "../../components/ProviderActivities";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,

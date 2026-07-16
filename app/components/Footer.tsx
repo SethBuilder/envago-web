@@ -101,6 +101,15 @@ export default function Footer() {
             Política de Privacidade
           </Link>
           <span>·</span>
+          <a
+            href="https://painel.envago.live/parceiros"
+            style={{ color: "#555", textDecoration: "none", transition: "color 0.15s" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+            onMouseLeave={e => (e.currentTarget.style.color = "#555")}
+          >
+            Listar meu passeio
+          </a>
+          <span>·</span>
           <span>© {new Date().getFullYear()} Envago. Todos os direitos reservados.</span>
         </div>
       </div>
