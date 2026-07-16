@@ -5,13 +5,6 @@ const ADMIN_COOKIE = "envago_admin";
 const COOKIE_MAX_AGE = 60 * 60; // 1 hour
 
 export function proxy(request: NextRequest) {
-  const host = request.headers.get("host") ?? "";
-  if (host.startsWith("www.")) {
-    const url = request.nextUrl.clone();
-    url.host = host.slice(4);
-    return NextResponse.redirect(url, { status: 301 });
-  }
-
   const comingSoon = process.env.NEXT_PUBLIC_COMING_SOON === "true";
   if (!comingSoon) return NextResponse.next();
 

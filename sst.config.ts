@@ -21,7 +21,8 @@ export default $config({
       },
       domain: {
         name: "envago.live",
-        cert: "arn:aws:acm:us-east-1:503726126229:certificate/2aba2294-cd0a-4e83-912c-e318858e7292",
+        redirects: ["www.envago.live"],
+        cert: "arn:aws:acm:us-east-1:503726126229:certificate/b7571a1b-881b-4ec8-a73d-b23b11f2ce05",
       },
     });
   },
